@@ -1,0 +1,72 @@
+.wrap {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+.heading {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.question {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.choices {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+.choice {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.choice:hover {
+  background: #f9fafb;
+}
+.selected {
+  outline: 2px solid #93c5fd;
+}
+.correct {
+  background: #ecfccb;
+}
+.wrong {
+  background: #fee2e2;
+}
+.submit,
+.retry {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: white;
+}
+.submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.explain {
+  margin-top: 8px;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.result {
+  position: sticky;
+  bottom: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}

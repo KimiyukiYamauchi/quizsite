@@ -1,0 +1,34 @@
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-top: 16px;
+}
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  transition: box-shadow 0.2s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+.title {
+  font-size: 28px;
+  font-weight: 700;
+}
+.desc {
+  color: #555;
+  margin-top: 4px;
+}
+.link {
+  display: inline-block;
+  margin-top: 8px;
+  font-weight: 600;
+  text-decoration: underline;
+}
