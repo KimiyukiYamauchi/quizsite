@@ -34,4 +34,3 @@ SAE/J の模擬問題のページ
 ### SAE/J のページ
 
 -/app/seaj/page.tsx
-git
