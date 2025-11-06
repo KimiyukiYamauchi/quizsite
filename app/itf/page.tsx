@@ -1,37 +1,16 @@
-"use client";
-
-import { itfQuestions } from "@/data/itf";
-import QuestionCard from "@/components/QuestionCard";
-import ResultPanel from "@/components/ResultPanel";
+import { getITFQuestions } from "@/lib/microcms";
+import Quiz from "@/components/Quiz";
 import styles from "@/styles/Quiz.module.css";
-import { useState } from "react";
 
-export default function ITFPage() {
-  const [correct, setCorrect] = useState(0);
-  const [answered, setAnswered] = useState(0);
+export const revalidate = 60; // ISR: 60秒ごとに再取得（必要に応じて調整）
 
-  const handleAnswered = (ok: boolean) => {
-    setAnswered((n) => n + 1);
-    if (ok) setCorrect((n) => n + 1);
-  };
-
-  const reset = () => {
-    setCorrect(0);
-    setAnswered(0);
-  };
+export default async function ITFPage() {
+  const questions = await getITFQuestions();
 
   return (
     <main className={styles.wrap}>
       <h1 className={styles.heading}>ITF+ 練習問題</h1>
-      {itfQuestions.map((q) => (
-        <QuestionCard key={q.id} q={q} onAnswered={handleAnswered} />
-      ))}
-
-      <ResultPanel
-        total={itfQuestions.length}
-        correct={correct}
-        onRetry={reset}
-      />
+      <Quiz questions={questions} />
     </main>
   );
 }
