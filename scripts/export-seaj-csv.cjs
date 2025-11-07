@@ -16,9 +16,7 @@ const INCLUDE_EXPLANATION = process.env.INCLUDE_EXPLANATION !== "false";
 // ===== 入力読み込み（dist/data/seaj.js） =====
 const inputJs = path.resolve(process.cwd(), "dist/seaj.js");
 if (!fs.existsSync(inputJs)) {
-  console.error(
-    "❌ dist/data/seaj.js が見つかりません。先に次を実行してください："
-  );
+  console.error("❌ dist/seaj.js が見つかりません。先に次を実行してください：");
   console.error(
     "   npx tsc data/seaj.ts --module commonjs --target es2020 --outDir dist"
   );
