@@ -3,7 +3,7 @@
 import { useState } from "react";
 import styles from "@/styles/Quiz.module.css";
 
-export type Choice = { id: string; text: string };
+export type Choice = { fieldId: string; selectId: string; text: string };
 export type Question = {
   id: string;
   text: string;
@@ -33,12 +33,12 @@ export default function QuestionCard({ q, onAnswered }: Props) {
       <p className={styles.question}>{q.text}</p>
       <ul className={styles.choices}>
         {q.choices.map((c) => {
-          const isSelected = selected === c.id;
-          const isCorrect = locked && c.id === q.answerId;
-          const isWrong = locked && isSelected && c.id !== q.answerId;
+          const isSelected = selected === c.selectId;
+          const isCorrect = locked && c.selectId === q.answerId;
+          const isWrong = locked && isSelected && c.selectId !== q.answerId;
 
           return (
-            <li key={c.id}>
+            <li key={c.selectId}>
               <label
                 className={[
                   styles.choice,
@@ -50,9 +50,9 @@ export default function QuestionCard({ q, onAnswered }: Props) {
                 <input
                   type="radio"
                   name={q.id}
-                  value={c.id}
+                  value={c.selectId}
                   disabled={locked}
-                  onChange={() => setSelected(c.id)}
+                  onChange={() => setSelected(c.selectId)}
                 />
                 <span>{c.text}</span>
               </label>

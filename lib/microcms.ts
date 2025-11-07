@@ -6,9 +6,9 @@ const apiKey = process.env.MICROCMS_API_KEY!;
 export const client = createClient({ serviceDomain, apiKey });
 
 // 既存の型をそのまま使用
-export type Choice = { id: string; text: string };
+export type Choice = { fieldId: string; selectId: string; text: string };
 export type Question = {
-  id: string;          // microCMSのコンテンツIDが入る
+  id: string; // microCMSのコンテンツIDが入る
   text: string;
   choices: Choice[];
   answerId: string;
@@ -23,7 +23,7 @@ type ListResponse<T> = {
 };
 
 export async function getQuestions(
-  endpoint: "itf-questions" | "seaj-questions",
+  endpoint: "itf-questions" | "seaj-questions"
 ) {
   const res = await client.get<ListResponse<Question>>({
     endpoint,
