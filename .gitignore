@@ -39,3 +39,4 @@ next-env.d.ts
 dist/
 exports/
 data/
+scripts/seed-seaj.ts
