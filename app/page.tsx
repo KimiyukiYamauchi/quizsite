@@ -11,15 +11,19 @@ export default function Page() {
       <div className={styles.grid}>
         <section className={styles.card}>
           <h2>ITF+（CompTIA IT Fundamentals）</h2>
-          <p className={styles.desc}>IT基礎の確認に最適な5問サンプル。</p>
+          <p className={styles.desc}>
+            基本的なコンピューティングとITインフラストラクチャのスキルと知識
+          </p>
           <Link className={styles.link} href="/itf">
             ITF+ の問題へ
           </Link>
         </section>
 
         <section className={styles.card}>
-          <h2>SEA/J（ソフトウェア技術者協会）</h2>
-          <p className={styles.desc}>要件定義・開発プロセス系の5問サンプル。</p>
+          <h2>SEA/J（セキュリティ 基礎コース）</h2>
+          <p className={styles.desc}>
+            情報セキュリティについて全ての基礎レベルの知識
+          </p>
           <Link className={styles.link} href="/seaj">
             SEA/J の問題へ
           </Link>
