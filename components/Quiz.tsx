@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { Question } from "@/lib/microcms";
 import QuestionCard from "@/components/QuestionCard";
 import ResultPanel from "@/components/ResultPanel";
-import styles from "@/styles/Quiz.module.css";
+import styles from "@/components/Quiz.module.css";
 
 type Props = { questions: Question[] };
 
@@ -17,20 +17,22 @@ export default function Quiz({ questions }: Props) {
 
   const reset = () => {
     setCorrect(0);
-    // ページをリロードしたくない場合は、QuestionCard側をkeyで再マウントする等の工夫も可
+    // 必要であれば、QuestionCard 側に key を振って再マウントする方式にもできます
+    // 例）map時に key={`${q.id}-${refreshKey}`} のように
   };
 
   return (
     <>
-      {questions.map((q) => (
-        <QuestionCard key={q.id} q={q} onAnswered={handleAnswered} />
+      {questions.map((q, i) => (
+        <QuestionCard
+          key={q.id}
+          question={q} // 問題データ
+          indexLabel={`Q${i + 1}`} // 任意の番号ラベル
+          onAnswered={handleAnswered} // ✅ 採点結果を受け取る
+        />
       ))}
 
-      <ResultPanel
-        total={questions.length}
-        correct={correct}
-        onRetry={reset}
-      />
+      <ResultPanel total={questions.length} correct={correct} onRetry={reset} />
     </>
   );
 }

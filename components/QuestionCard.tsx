@@ -1,81 +1,172 @@
+// components/QuestionCard.tsx
 "use client";
 
-import { useState } from "react";
-import styles from "@/styles/Quiz.module.css";
+import { useMemo, useState } from "react";
+import type { Question } from "@/lib/microcms";
+import styles from "@/components/QuestionCard.module.css";
 
-export type Choice = { fieldId: string; selectId: string; text: string };
-export type Question = {
-  id: string;
-  text: string;
-  choices: Choice[];
-  answerId: string;
-  explanation?: string;
-};
+// a,b,c... の表示順を保証
+const bySelectId = (a: { selectId: string }, b: { selectId: string }) =>
+  a.selectId.localeCompare(b.selectId);
 
 type Props = {
-  q: Question;
-  onAnswered: (correct: boolean) => void;
+  question: Question;
+  // 例："問題 x / n" 等を任意で表示したい時
+  indexLabel?: string;
+  // 正解表示モード（自動採点後に解説まで出すかどうか）
+  showExplanationAfterSubmit?: boolean;
+  // ✅ 追加：採点結果コールバック（正解なら true）
+  onAnswered?: (ok: boolean) => void;
 };
 
-export default function QuestionCard({ q, onAnswered }: Props) {
-  const [selected, setSelected] = useState<string | null>(null);
-  const [locked, setLocked] = useState(false);
+export default function QuestionCard({
+  question,
+  indexLabel,
+  showExplanationAfterSubmit = true,
+  onAnswered,
+}: Props) {
+  // 小文字化/ソート済みの choices / answers
+  const choices = useMemo(
+    () => [...(question.choices || [])].sort(bySelectId),
+    [question.choices]
+  );
 
-  const handleSubmit = () => {
-    if (selected == null) return;
-    const correct = selected === q.answerId;
-    setLocked(true);
-    onAnswered(correct);
+  const correctSet = useMemo(() => {
+    const set = new Set(
+      (question.answerId || []).map((a) => a.answerId.toLowerCase())
+    );
+    return set;
+  }, [question.answerId]);
+
+  // ユーザーの選択状態（複数正解に対応 → Set）
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [submitted, setSubmitted] = useState(false);
+
+  const isCorrect = useMemo(() => {
+    if (!submitted) return null;
+
+    // 選択と正解の集合が完全一致かどうか
+    let ok = true;
+    selected.forEach((v) => {
+      if (!correctSet.has(v)) ok = false;
+    });
+    return ok;
+  }, [submitted, selected, correctSet]);
+
+  const toggle = (id: string) => {
+    const next = new Set(selected);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelected(next);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // いまの選択が正解かを即時計算（Setの反復は forEach と Array.from で）
+    let okNow = true;
+    if (selected.size !== correctSet.size) okNow = false;
+    else {
+      selected.forEach((v) => {
+        if (!correctSet.has(v)) okNow = false;
+      });
+    }
+
+    setSubmitted(true);
+  };
+
+  const handleReset = () => {
+    setSelected(new Set());
+    setSubmitted(false);
   };
 
   return (
     <div className={styles.card}>
-      <p className={styles.question}>{q.text}</p>
-      <ul className={styles.choices}>
-        {q.choices.map((c) => {
-          const isSelected = selected === c.selectId;
-          const isCorrect = locked && c.selectId === q.answerId;
-          const isWrong = locked && isSelected && c.selectId !== q.answerId;
+      <header className={styles.header}>
+        {indexLabel && <span className={styles.index}>{indexLabel}</span>}
+        {question.chapter && (
+          <span className={styles.chapter}>{question.chapter}</span>
+        )}
+      </header>
 
-          return (
-            <li key={c.selectId}>
-              <label
-                className={[
-                  styles.choice,
-                  isSelected ? styles.selected : "",
-                  isCorrect ? styles.correct : "",
-                  isWrong ? styles.wrong : "",
-                ].join(" ")}
-              >
-                <input
-                  type="radio"
-                  name={q.id}
-                  value={c.selectId}
-                  disabled={locked}
-                  onChange={() => setSelected(c.selectId)}
-                />
-                <span>{c.text}</span>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      <h2 className={styles.text}>{question.text}</h2>
 
-      {!locked ? (
-        <button
-          className={styles.submit}
-          onClick={handleSubmit}
-          disabled={selected == null}
-        >
-          回答する
-        </button>
-      ) : (
-        q.explanation && (
-          <div className={styles.explain}>
-            <strong>解説：</strong>
-            <p>{q.explanation}</p>
-          </div>
-        )
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <ul className={styles.choices}>
+          {choices.map((c) => {
+            const checked = selected.has(c.selectId);
+            const isAnswer = correctSet.has(c.selectId);
+
+            // 採点後の色付け（任意）
+            const choiceClass = [
+              styles.choice,
+              submitted && isAnswer ? styles.correct : "",
+              submitted && checked && !isAnswer ? styles.wrong : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+
+            return (
+              <li key={c.selectId} className={choiceClass}>
+                <label className={styles.choiceLabel}>
+                  <input
+                    type="checkbox" // 複数正解に対応
+                    className={styles.checkbox}
+                    checked={checked}
+                    onChange={() => toggle(c.selectId)}
+                    disabled={submitted}
+                  />
+                  <span className={styles.choiceId}>
+                    {c.selectId.toUpperCase()}.
+                  </span>
+                  <span className={styles.choiceText}>{c.text}</span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className={styles.actions}>
+          {!submitted ? (
+            <button type="submit" className={styles.submitBtn}>
+              回答する
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleReset}
+              className={styles.resetBtn}
+            >
+              もう一度
+            </button>
+          )}
+        </div>
+      </form>
+
+      {/* 採点結果 */}
+      {submitted && (
+        <div className={styles.result}>
+          {isCorrect ? (
+            <p className={styles.resultCorrect}>正解！</p>
+          ) : (
+            <p className={styles.resultWrong}>
+              不正解。正解は{" "}
+              {Array.from(correctSet)
+                .sort()
+                .map((x) => x.toUpperCase())
+                .join(", ")}
+              です。
+            </p>
+          )}
+
+          {/* 解説 */}
+          {showExplanationAfterSubmit && question.explanation && (
+            <div className={styles.explanation}>
+              <h3>解説</h3>
+              <p>{question.explanation}</p>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
