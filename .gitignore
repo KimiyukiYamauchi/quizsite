@@ -40,3 +40,4 @@ dist/
 exports/
 data/
 scripts/seed-seaj.ts
+scripts/seed.ts
