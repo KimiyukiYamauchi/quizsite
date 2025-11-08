@@ -4,7 +4,6 @@ import { useState } from "react";
 import type { Question } from "@/lib/microcms";
 import QuestionCard from "@/components/QuestionCard";
 import ResultPanel from "@/components/ResultPanel";
-import styles from "@/components/Quiz.module.css";
 
 type Props = { questions: Question[] };
 
