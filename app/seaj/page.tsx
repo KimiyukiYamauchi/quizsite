@@ -1,6 +1,7 @@
 import { getSEAJQuestionsPage } from "@/lib/microcms";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
+import StickyHeader from "@/components/StickyHeader";
 import styles from "@/styles/Quiz.module.css";
 
 export const revalidate = 0;
@@ -19,8 +20,9 @@ export default async function SEAJPage({ searchParams }: PageProps) {
 
   return (
     <main className={styles.wrap}>
-      <h1>SEA/J 検定対策</h1>
-      <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
+      <StickyHeader title="SEA/J 検定対策">
+        <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
+      </StickyHeader>
       <Quiz questions={items} />
       <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
     </main>

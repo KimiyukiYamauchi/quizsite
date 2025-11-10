@@ -1,6 +1,7 @@
 import { getITFQuestionsPage } from "@/lib/microcms";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
+import StickyHeader from "@/components/StickyHeader";
 import styles from "@/styles/Quiz.module.css";
 
 export const revalidate = 0; // ISR無効
@@ -25,8 +26,9 @@ export default async function ITFPage({ searchParams }: PageProps) {
 
   return (
     <main className={styles.wrap}>
-      <h1 className={styles.heading}>ITF+ 練習問題</h1>
-      <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} />
+      <StickyHeader title="ITF+ 検定対策">
+        <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
+      </StickyHeader>
       <Quiz questions={items} />
       <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} />
     </main>
