@@ -38,6 +38,23 @@ export default function QuestionCard({
     return set;
   }, [question.answerId]);
 
+  // 追加: 単一/複数を判定
+  const isMulti = correctSet.size > 1;
+  const inputType: "checkbox" | "radio" = isMulti ? "checkbox" : "radio";
+
+  // 変更: トグルの挙動を切り替え
+  const toggle = (id: string) => {
+    if (isMulti) {
+      const next = new Set(selected);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      setSelected(next);
+    } else {
+      // 単一正解: その1つだけを選択状態にする
+      setSelected(new Set([id]));
+    }
+  };
+
   // ユーザーの選択状態（複数正解に対応 → Set）
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
@@ -112,15 +129,11 @@ export default function QuestionCard({
               <li key={c.selectId} className={choiceClass}>
                 <label className={styles.choiceLabel}>
                   <input
-                    type="checkbox" // 複数正解に対応
+                    type={inputType} // ★ 自動切替
+                    name={question.id} // ★ ラジオ時は同一グループ
                     className={styles.checkbox}
                     checked={checked}
-                    onChange={() => {
-                      const next = new Set(selected);
-                      if (next.has(c.selectId)) next.delete(c.selectId);
-                      else next.add(c.selectId);
-                      setSelected(next);
-                    }}
+                    onChange={() => toggle(c.selectId)}
                     disabled={submitted}
                   />
                   <span className={styles.choiceId}>
