@@ -41,10 +41,13 @@ export default function QuestionCard({
   // ユーザーの選択状態（複数正解に対応 → Set）
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [submitted, setSubmitted] = useState(false);
+  const [version, setVersion] = useState(0);
 
   const isCorrect = useMemo(() => {
     if (!submitted) return null;
 
+    // 完全一致（サイズも一致）
+    if (selected.size !== correctSet.size) return false;
     // 選択と正解の集合が完全一致かどうか
     let ok = true;
     selected.forEach((v) => {
@@ -52,13 +55,6 @@ export default function QuestionCard({
     });
     return ok;
   }, [submitted, selected, correctSet]);
-
-  const toggle = (id: string) => {
-    const next = new Set(selected);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    setSelected(next);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,8 +72,11 @@ export default function QuestionCard({
   };
 
   const handleReset = () => {
+    // 内部状態を初期化
     setSelected(new Set());
     setSubmitted(false);
+    // ★ サブツリーを再マウントして input/クラス/表示を完全リセット
+    setVersion((v) => v + 1);
   };
 
   return (
@@ -91,7 +90,10 @@ export default function QuestionCard({
 
       <h2 className={styles.text}>{question.text}</h2>
 
-      <form onSubmit={handleSubmit} className={styles.form}>
+      {/* ★ version を key に付ける（フォームまたはその直下のラッパーに） */}
+      <form key={version} onSubmit={handleSubmit} className={styles.form}>
+        {/* ※ submitted 切替だけでは足りないケースがあるので version を使う */}
+
         <ul className={styles.choices}>
           {choices.map((c) => {
             const checked = selected.has(c.selectId);
@@ -113,7 +115,12 @@ export default function QuestionCard({
                     type="checkbox" // 複数正解に対応
                     className={styles.checkbox}
                     checked={checked}
-                    onChange={() => toggle(c.selectId)}
+                    onChange={() => {
+                      const next = new Set(selected);
+                      if (next.has(c.selectId)) next.delete(c.selectId);
+                      else next.add(c.selectId);
+                      setSelected(next);
+                    }}
                     disabled={submitted}
                   />
                   <span className={styles.choiceId}>
