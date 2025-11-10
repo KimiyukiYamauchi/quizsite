@@ -1,0 +1,45 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin: 20px 0;
+}
+.btn {
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.btn[aria-disabled="true"] {
+  opacity: 0.4;
+  pointer-events: none;
+}
+.pages {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.page {
+  display: inline-block;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  text-decoration: none;
+}
+.active {
+  background: #111827;
+  color: #fff;
+  border-color: #111827;
+}
+.dots {
+  padding: 0 6px;
+  color: #9ca3af;
+}
+.item {
+  display: flex;
+  align-items: center;
+}

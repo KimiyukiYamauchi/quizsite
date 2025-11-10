@@ -78,28 +78,27 @@ function normalizeQuestion(raw: Question): Question {
   };
 }
 
-// ==== 取得関数（一覧・詳細など必要に応じて） ====
-// endpoint 例： "seaj-questions" / "itf-questions"
+// q を undefined で送らないユーティリティ
+function buildQueries(params: { limit?: number; offset?: number; q?: string }) {
+  const out: Record<string, any> = {};
+  if (typeof params.limit === "number") out.limit = params.limit;
+  if (typeof params.offset === "number") out.offset = params.offset;
+  if (typeof params.q === "string" && params.q.length > 0) out.q = params.q;
+  return out;
+}
+
 export async function getQuestions(params: {
   endpoint: string;
-  limit?: number;
-  offset?: number;
-  q?: string; // フリーワード検索が有効なら
+  limit?: number; // 100まで
+  offset?: number; // (page-1)*perPage
+  q?: string;
 }) {
-  // console.log("Fetching questions from microCMS:", params);
   const { endpoint, limit = 50, offset = 0, q } = params;
-
-  // ❗undefined を弾く
-  const queries: Record<string, any> = { limit, offset };
-  if (typeof q === "string" && q.length > 0) {
-    queries.q = q;
-  }
 
   try {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
-      queries,
-      // SDKは customRequestInit を受け取れる：Nextのfetch相当のオプションを渡せる
+      queries: buildQueries({ limit, offset, q }),
       customRequestInit: { cache: "no-store" as RequestCache },
     });
 
@@ -113,11 +112,12 @@ export async function getQuestions(params: {
     //   res.totalCount,
     //   " contents.length=",
     //   res.contents?.length
-    // );
 
-    return { ...res, contents: res.contents.map(normalizeQuestion) };
+    return {
+      ...res,
+      contents: res.contents.map(normalizeQuestion),
+    };
   } catch (e: any) {
-    // ここで原因特定しやすいよう詳細を吐く
     console.error("microCMS GET list failed:", {
       serviceDomain: SERVICE_DOMAIN,
       endpoint,
@@ -126,6 +126,27 @@ export async function getQuestions(params: {
     });
     throw e;
   }
+}
+
+// 1ページ分だけ取得するヘルパー（perPageは100以下にしてね）
+export async function getQuestionsPage(params: {
+  endpoint: string;
+  page: number; // 1始まり
+  perPage: number; // 100以下
+  q?: string;
+}) {
+  const { endpoint, page, perPage, q } = params;
+  const current = Math.max(1, Math.floor(page) || 1);
+  const limit = Math.min(100, Math.max(1, Math.floor(perPage) || 10));
+  const offset = (current - 1) * limit;
+
+  const { contents, totalCount } = await getQuestions({
+    endpoint,
+    limit,
+    offset,
+    q,
+  });
+  return { items: contents, totalCount, page: current, perPage: limit };
 }
 
 export async function getQuestionDetail(params: {
@@ -162,6 +183,9 @@ export async function getITFQuestions(limit = 50) {
     limit,
   });
 }
+export async function getITFQuestionsPage(page: number, perPage = 10) {
+  return getQuestionsPage({ endpoint: "itf-questions", page, perPage });
+}
 
 // SEAJ 検定問題一覧を取得
 export async function getSEAJQuestions(limit = 50) {
@@ -169,6 +193,9 @@ export async function getSEAJQuestions(limit = 50) {
     endpoint: "seaj-questions",
     limit,
   });
+}
+export async function getSEAJQuestionsPage(page: number, perPage = 10) {
+  return getQuestionsPage({ endpoint: "seaj-questions", page, perPage });
 }
 
 // lib/microcms.ts に試験関数を追加（不要になったら削除OK）

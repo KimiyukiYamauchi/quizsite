@@ -1,21 +1,34 @@
-import { getITFQuestions, debugFetchList } from "@/lib/microcms";
+import { getITFQuestionsPage } from "@/lib/microcms";
 import Quiz from "@/components/Quiz";
+import Pagination from "@/components/Pagination";
 import styles from "@/styles/Quiz.module.css";
 
 export const revalidate = 0; // ISR無効
 export const dynamic = "force-dynamic";
 
-export default async function ITFPage() {
+type PageProps = {
+  searchParams?: { page?: string };
+};
+
+const PER_PAGE = 10;
+
+export default async function ITFPage({ searchParams }: PageProps) {
   // 比較テスト
   // await debugFetchList("itf-questions", 1);
 
-  const { contents: questions } = await getITFQuestions(50);
-  // console.log("ITF questions loaded:", questions.length);
+  const current = Math.max(1, Number(searchParams?.page ?? 1) || 1);
+
+  const page = Math.max(1, Number(searchParams?.page ?? 1) || 1);
+
+  // ← ここが offset/limit を使う呼び出し
+  const { items, totalCount } = await getITFQuestionsPage(page, PER_PAGE);
 
   return (
     <main className={styles.wrap}>
       <h1 className={styles.heading}>ITF+ 練習問題</h1>
-      <Quiz questions={questions} />
+      <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} />
+      <Quiz questions={items} />
+      <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} />
     </main>
   );
 }
