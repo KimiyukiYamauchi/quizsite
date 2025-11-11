@@ -2,6 +2,8 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 24px 16px;
+  background-color: #ffffff; /* 白で固定 */
+  color: #111111; /* ほぼ黒で固定 */
 }
 .heading {
   font-size: 24px;
@@ -13,6 +15,8 @@
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  background-color: #ffffff; /* 白で固定 */
+  color: #111111; /* 文字色も固定（継承で白にならないように） */
 }
 .question {
   font-weight: 600;
@@ -32,6 +36,9 @@
 }
 .choice:hover {
   background: #f9fafb;
+}
+.choice span {
+  color: inherit;
 }
 .selected {
   outline: 2px solid #93c5fd;
