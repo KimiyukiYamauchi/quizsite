@@ -16,7 +16,7 @@ type Props = {
   // 正解表示モード（自動採点後に解説まで出すかどうか）
   showExplanationAfterSubmit?: boolean;
   // ✅ 追加：採点結果コールバック（正解なら true）
-  onAnswered?: (ok: boolean) => void;
+  onAnswered: (ok: boolean) => void;
 };
 
 export default function QuestionCard({
@@ -76,6 +76,9 @@ export default function QuestionCard({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // すでに送信済みなら何もしない（多重カウント防止）
+    if (submitted) return;
+
     // いまの選択が正解かを即時計算（Setの反復は forEach と Array.from で）
     let okNow = true;
     if (selected.size !== correctSet.size) okNow = false;
@@ -85,6 +88,10 @@ export default function QuestionCard({
       });
     }
 
+    // ✅ ここを忘れるとスコアが上がらない
+    onAnswered(okNow);
+
+    // 採点済みにする
     setSubmitted(true);
   };
 
