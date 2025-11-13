@@ -1,9 +1,11 @@
 // components/QuestionCard.tsx
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Question } from "@/lib/microcms";
 import styles from "@/components/QuestionCard.module.css";
+
+export type Choice = { id: string | number; text: string };
 
 // a,b,c... の表示順を保証
 const bySelectId = (a: { selectId: string }, b: { selectId: string }) =>
@@ -17,13 +19,20 @@ type Props = {
   showExplanationAfterSubmit?: boolean;
   // ✅ 追加：採点結果コールバック（正解なら true）
   onAnswered: (ok: boolean) => void;
+  cycle: number; // 親からのリセット合図
 };
+
+const norm = (v: string | number | null | undefined) =>
+  String(v ?? "")
+    .trim()
+    .toLowerCase();
 
 export default function QuestionCard({
   question,
   indexLabel,
   showExplanationAfterSubmit = true,
   onAnswered,
+  cycle,
 }: Props) {
   // 小文字化/ソート済みの choices / answers
   const choices = useMemo(
@@ -95,6 +104,12 @@ export default function QuestionCard({
     setSubmitted(true);
   };
 
+  // 親の「もう一度チャレンジ」で state を初期化（ボタン再び有効化）
+  useEffect(() => {
+    setSelected(new Set());
+    setSubmitted(false);
+  }, [cycle]);
+
   const handleReset = () => {
     // 内部状態を初期化
     setSelected(new Set());
@@ -154,19 +169,14 @@ export default function QuestionCard({
         </ul>
 
         <div className={styles.actions}>
-          {!submitted ? (
-            <button type="submit" className={styles.submitBtn}>
-              回答する
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleReset}
-              className={styles.resetBtn}
-            >
-              もう一度
-            </button>
-          )}
+          {/* ラベルは常に「回答する」。回答後は disabled */}
+          <button
+            className={styles.submitBtn}
+            onClick={handleSubmit}
+            disabled={submitted || selected == new Set()}
+          >
+            回答する
+          </button>
         </div>
       </form>
 
