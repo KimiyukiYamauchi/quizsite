@@ -72,14 +72,19 @@
   display: flex;
   gap: 8px;
 }
-.submitBtn,
-.resetBtn {
+.submitBtn {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid #e5e7eb;
   background: #111827;
   color: #fff;
 }
+
+.submitBtn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .result {
   margin-top: 12px;
 }
