@@ -30,7 +30,7 @@ export default async function ITFPage({ searchParams }: PageProps) {
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
       <Quiz questions={items} />
-      <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} />
+      {/* <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} /> */}
     </main>
   );
 }
