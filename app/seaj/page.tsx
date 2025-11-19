@@ -23,7 +23,10 @@ export default async function SEAJPage({ searchParams }: PageProps) {
       <StickyHeader title="SEA/J 検定対策">
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
-      <Quiz questions={items} />
+      <Quiz
+        key={page} // 🔴 これがポイント：ページごとに別コンポーネント扱い
+        questions={items}
+      />
       {/* <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} /> */}
     </main>
   );
