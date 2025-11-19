@@ -5,9 +5,12 @@ import type { Question } from "@/lib/microcms";
 import QuestionCard from "@/components/QuestionCard";
 import ResultPanel from "@/components/ResultPanel";
 
-type Props = { questions: Question[] };
+type Props = {
+  questions: Question[];
+  basePath: string; // ★ 追加：ITFなら "/itf", SEAJなら "/seaj"
+};
 
-export default function Quiz({ questions }: Props) {
+export default function Quiz({ questions, basePath }: Props) {
   const [correct, setCorrect] = useState(0);
   const [answered, setAnswered] = useState(0);
 
@@ -35,6 +38,7 @@ export default function Quiz({ questions }: Props) {
           indexLabel={`Q${i + 1}`} // 任意の番号ラベル
           onAnswered={handleAnswered} // ✅ 採点結果を受け取る
           cycle={cycle} // ← リセット合図
+          basePath={basePath} // ★ QuestionCard へ渡す
         />
       ))}
 

@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import type { Question } from "@/lib/microcms";
 import styles from "@/components/QuestionCard.module.css";
 
@@ -20,6 +21,7 @@ type Props = {
   // ✅ 追加：採点結果コールバック（正解なら true）
   onAnswered: (ok: boolean) => void;
   cycle: number; // 親からのリセット合図
+  basePath: string; // ★ 追加：ITFなら "/itf", SEAJなら "/seaj"
 };
 
 const norm = (v: string | number | null | undefined) =>
@@ -33,6 +35,7 @@ export default function QuestionCard({
   showExplanationAfterSubmit = true,
   onAnswered,
   cycle,
+  basePath,
 }: Props) {
   // 小文字化/ソート済みの choices / answers
   const choices = useMemo(
@@ -123,7 +126,13 @@ export default function QuestionCard({
       <header className={styles.header}>
         {indexLabel && <span className={styles.index}>{indexLabel}</span>}
         {question.chapter && (
-          <span className={styles.chapter}>{question.chapter}</span>
+          <Link
+            href={`${basePath}/chapter/${encodeURIComponent(
+              question.chapter!
+            )}`}
+          >
+            {question.chapter}
+          </Link>
         )}
       </header>
 

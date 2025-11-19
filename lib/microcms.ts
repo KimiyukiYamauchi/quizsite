@@ -78,12 +78,23 @@ function normalizeQuestion(raw: Question): Question {
   };
 }
 
-// q を undefined で送らないユーティリティ
-function buildQueries(params: { limit?: number; offset?: number; q?: string }) {
+// q / chapter を undefined で送らないユーティリティ
+function buildQueries(params: {
+  limit?: number;
+  offset?: number;
+  q?: string;
+  chapter?: string;
+}) {
   const out: Record<string, any> = {};
   if (typeof params.limit === "number") out.limit = params.limit;
   if (typeof params.offset === "number") out.offset = params.offset;
-  if (typeof params.q === "string" && params.q.length > 0) out.q = params.q;
+  if (typeof params.q === "string" && params.q.length > 0) {
+    out.q = params.q;
+  }
+  if (typeof params.chapter === "string" && params.chapter.length > 0) {
+    // ★ microCMS の filters 構文で chapter による絞り込み
+    out.filters = `chapter[equals]${params.chapter}`;
+  }
   return out;
 }
 
@@ -92,13 +103,14 @@ export async function getQuestions(params: {
   limit?: number; // 100まで
   offset?: number; // (page-1)*perPage
   q?: string;
+  chapter?: string; // ★追加
 }) {
-  const { endpoint, limit = 50, offset = 0, q } = params;
+  const { endpoint, limit = 50, offset = 0, q, chapter } = params;
 
   try {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
-      queries: buildQueries({ limit, offset, q }),
+      queries: buildQueries({ limit, offset, q, chapter }),
       customRequestInit: { cache: "no-store" as RequestCache },
     });
 
@@ -196,6 +208,24 @@ export async function getSEAJQuestions(limit = 50) {
 }
 export async function getSEAJQuestionsPage(page: number, perPage = 10) {
   return getQuestionsPage({ endpoint: "seaj-questions", page, perPage });
+}
+
+// ITF+：chapter 指定で問題一覧を取得
+export async function getITFQuestionsByChapter(chapter: string, limit = 100) {
+  return await getQuestions({
+    endpoint: "itf-questions",
+    limit,
+    chapter,
+  });
+}
+
+// SEAJ：chapter 指定で問題一覧を取得
+export async function getSEAJQuestionsByChapter(chapter: string, limit = 100) {
+  return await getQuestions({
+    endpoint: "seaj-questions",
+    limit,
+    chapter,
+  });
 }
 
 // lib/microcms.ts に試験関数を追加（不要になったら削除OK）

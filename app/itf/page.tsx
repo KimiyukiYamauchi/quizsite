@@ -32,6 +32,7 @@ export default async function ITFPage({ searchParams }: PageProps) {
       <Quiz
         key={page} // 🔴 これがポイント：ページごとに別コンポーネント扱い
         questions={items}
+        basePath="/itf"
       />
       {/* <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} /> */}
     </main>

@@ -26,6 +26,7 @@ export default async function SEAJPage({ searchParams }: PageProps) {
       <Quiz
         key={page} // 🔴 これがポイント：ページごとに別コンポーネント扱い
         questions={items}
+        basePath="/seaj"
       />
       {/* <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} /> */}
     </main>
