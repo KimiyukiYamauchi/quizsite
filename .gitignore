@@ -41,3 +41,6 @@ exports/
 data/
 scripts/seed-seaj.ts
 scripts/seed.ts
+scripts/export-itf-csv.cjs
+scripts/export-seaj-csv.cjs
+scripts/seed-seaj.cjs
