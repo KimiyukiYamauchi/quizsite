@@ -33,10 +33,18 @@ SAE/J の模擬問題のページ
 - /app/itf/page.tsx => ページ定義
 - /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
 
+### ITF の章ごとページ
+
+- /app/itf/chapter/[chapter]/page.tsx => ページ定義
+
 ### SAE/J のページ
 
 - /app/seaj/page.tsx => ページ定義
 - /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
+
+### ISAE/J の章ごとページ
+
+- /app/seaj/chapter/[chapter]/page.tsx => ページ定義
 
 ### コンポーネント
 
@@ -58,4 +66,3 @@ SAE/J の模擬問題のページ
 
 - /scripts/json_to_microcms_csv.py => json ファイルを microCMS にインポートするため csv ファイルに変換する
 - /scripts/ping-microcms.cjs => MicroCMS への接続確認スクリプト
-
