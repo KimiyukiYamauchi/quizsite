@@ -1,4 +1,6 @@
 // scripts/ping-microcms.cjs
+// MicroCMS への接続確認スクリプト
+// node scripts/ping-microcms.cjs
 const fs = require("fs");
 const path = require("path");
 

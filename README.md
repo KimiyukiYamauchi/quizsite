@@ -38,45 +38,27 @@ Next.js と React を使って構築されています。
 
 ### app
 
-- `layout.tsx` --- 全ページ共通レイアウト
-- `page.tsx` --- トップページ
-- 各種章ごとのページ
+- /app/layout.tsx => レイアウト
+- /app/page.tsx => ページ定義
+- /styles/Home.module.css => トップページのスタイル
 
-### components
+### ITF のページ
 
-- `Quiz` --- クイズ全体コンポーネント
-- `QuestionCard` --- 問題表示コンポーネント
-- `ResultPanel` --- 正解数表示
-- `Pagination` --- ページ送り
-- `StickyHeader` --- 問題ヘッダー
+- /app/itf/page.tsx => ページ定義
+- /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
 
-### lib/microcms
+### SAE/J のページ
 
-- microCMS API から問題データを取得
+- /app/seaj/page.tsx => ページ定義
+- /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
 
-### scripts
+### コンポーネント
 
-- `json_to_microcms_csv.py` --- JSON → CSV 変換
-- `ping-microcms.cjs` --- microCMS 接続確認
+- /components/Quiz => ITF、SAE/J 共通の問題ページコンポーネント
+- /components/QuestionCard  
+  => Quiz コンポーネントから使用される、一問一答のコンポーネント
+- /components/QuestionCard.module.css => QuestionCard のスタイル
 
-## 🛠 開発環境のセットアップ
+### microCMS アクセス
 
-```bash
-git clone https://github.com/KimiyukiYamauchi/quizsite.git
-cd quizsite
-npm install
-npm run dev
-```
-
-ブラウザで以下にアクセス:
-
-    http://localhost:3000
-
-## 📦 使用技術
-
-- Next.js
-- React
-- TypeScript
-- CSS Modules
-- microCMS
-- Vercel
+- /lib/microcms => microCMS から問題データを取得
