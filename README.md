@@ -32,33 +32,56 @@ Next.js と React を使って構築されています。
 | `/seaj`                   | SAE/J 問題ページ           |
 | `/seaj/chapter/[chapter]` | SAE/J の各章ごとの練習問題 |
 
----
-
 ## 📁 ディレクトリ構成
 
 ### app
 
-- /app/layout.tsx => レイアウト
-- /app/page.tsx => ページ定義
-- /styles/Home.module.css => トップページのスタイル
+- `layout.tsx` --- 全ページ共通レイアウト
+- `page.tsx` --- トップページ
 
-### ITF のページ
+#### app/itf
 
-- /app/itf/page.tsx => ページ定義
-- /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
+- `page.tsx` --- itfのページ
 
-### SAE/J のページ
+#### app/seaj
 
-- /app/seaj/page.tsx => ページ定義
-- /styles/Quiz.module.css => ITF、SAE/J 共通のスタイル
+- `page.tsx` --- SAE/J のページ
 
-### コンポーネント
+### components
 
-- /components/Quiz => ITF、SAE/J 共通の問題ページコンポーネント
-- /components/QuestionCard  
-  => Quiz コンポーネントから使用される、一問一答のコンポーネント
-- /components/QuestionCard.module.css => QuestionCard のスタイル
+- `Quiz` --- クイズ全体コンポーネント
+- `QuestionCard` --- 問題表示コンポーネント
+- `ResultPanel` --- 正解数表示
+- `Pagination` --- ページ送り
+- `StickyHeader` --- 問題ヘッダー
 
-### microCMS アクセス
+### lib/microcms
 
-- /lib/microcms => microCMS から問題データを取得
+- microCMS API から問題データを取得
+
+### scripts
+
+- `json_to_microcms_csv.py` --- JSON → CSV 変換
+- `ping-microcms.cjs` --- microCMS 接続確認
+
+## 🛠 開発環境のセットアップ
+
+```bash
+git clone https://github.com/KimiyukiYamauchi/quizsite.git
+cd quizsite
+npm install
+npm run dev
+```
+
+ブラウザで以下にアクセス:
+
+    http://localhost:3000
+
+## 📦 使用技術
+
+- Next.js
+- React
+- TypeScript
+- CSS Modules
+- microCMS
+- Vercel
