@@ -5,9 +5,6 @@ import Pagination from "@/components/Pagination";
 import StickyHeader from "@/components/StickyHeader";
 import styles from "@/styles/Quiz.module.css";
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
-
 type PageProps = {
   searchParams: Promise<{ page?: string }>;
 };
