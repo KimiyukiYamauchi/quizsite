@@ -49,6 +49,11 @@ export const microcmsClient = createClient({
   apiKey: API_KEY,
 });
 
+// microCMS の取得結果をキャッシュする秒数（Next.js の Data Cache）
+// 問題を更新してから最大この秒数でサイトに反映される
+const REVALIDATE_SECONDS = 60;
+const cacheOptions = { next: { revalidate: REVALIDATE_SECONDS } };
+
 // ==== 正規化ユーティリティ ====
 const toLowerLetter = (s: string) => (s || "").trim().toLowerCase();
 
@@ -111,7 +116,7 @@ export async function getQuestions(params: {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
       queries: buildQueries({ limit, offset, q, chapter }),
-      customRequestInit: { cache: "no-store" as RequestCache },
+      customRequestInit: cacheOptions,
     });
 
     // ★ ここで実ログ
@@ -170,7 +175,7 @@ export async function getQuestionDetail(params: {
     const q = await microcmsClient.get<Question>({
       endpoint,
       contentId,
-      customRequestInit: { cache: "no-store" as RequestCache },
+      customRequestInit: cacheOptions,
     });
     return normalizeQuestion(q);
   } catch (e) {
