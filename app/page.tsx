@@ -6,7 +6,7 @@ export default function Page() {
     <main className={styles.container}>
       <h1 className={styles.title}>検定対策トップ</h1>
       <p className={styles.desc}>
-        2種類の検定から選んで演習できます。問題は随時拡張可能です。
+        2種類の検定から選んで演習できます。
       </p>
       <div className={styles.grid}>
         <section className={styles.card}>
