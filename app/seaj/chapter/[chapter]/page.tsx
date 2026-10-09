@@ -4,13 +4,13 @@ import Quiz from "@/components/Quiz";
 import { getSEAJQuestionsByChapter } from "@/lib/microcms";
 
 type Props = {
-  params: { chapter: string };
+  params: Promise<{ chapter: string }>;
 };
 
 export const revalidate = 60;
 
 export default async function SEAJChapterPage({ params }: Props) {
-  const chapter = decodeURIComponent(params.chapter);
+  const chapter = decodeURIComponent((await params).chapter);
 
   const { contents } = await getSEAJQuestionsByChapter(chapter, 100);
 
