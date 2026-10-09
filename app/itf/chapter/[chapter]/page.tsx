@@ -29,7 +29,14 @@ export default async function ITFChapterPage({ params, searchParams }: Props) {
 
   return (
     <main className={styles.wrap}>
-      <StickyHeader title={`ITF+ ${chapter}`}>
+      <StickyHeader
+        title={`ITF+ ${chapter}`}
+        breadcrumbs={[
+          { label: "TOP", href: "/" },
+          { label: "ITF+", href: "/itf" },
+          { label: chapter },
+        ]}
+      >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
       <Quiz key={page} questions={items} basePath="/itf" />

@@ -1,0 +1,29 @@
+.nav {
+  font-size: 13px;
+  color: #6b7280;
+}
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.item {
+  display: flex;
+  align-items: center;
+}
+/* 2つ目以降の項目の前に区切り文字を入れる */
+.item + .item::before {
+  content: ">";
+  padding: 0 8px;
+  color: #9ca3af;
+}
+.link {
+  color: #2563eb;
+  text-decoration: none;
+}
+.link:hover {
+  text-decoration: underline;
+}
