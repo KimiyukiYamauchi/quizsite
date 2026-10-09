@@ -26,7 +26,10 @@ export default async function ITFPage({ searchParams }: PageProps) {
 
   return (
     <main className={styles.wrap}>
-      <StickyHeader title="ITF+ 検定対策">
+      <StickyHeader
+        title="ITF+ 検定対策"
+        breadcrumbs={[{ label: "TOP", href: "/" }, { label: "ITF+" }]}
+      >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
       <Quiz

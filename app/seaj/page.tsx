@@ -22,7 +22,10 @@ export default async function SEAJPage({ searchParams }: PageProps) {
 
   return (
     <main className={styles.wrap}>
-      <StickyHeader title="SEA/J 検定対策">
+      <StickyHeader
+        title="SEA/J 検定対策"
+        breadcrumbs={[{ label: "TOP", href: "/" }, { label: "SEA/J" }]}
+      >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
       <Quiz

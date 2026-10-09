@@ -29,7 +29,14 @@ export default async function SEAJChapterPage({ params, searchParams }: Props) {
 
   return (
     <main className={styles.wrap}>
-      <StickyHeader title={`SEA/J ${chapter}`}>
+      <StickyHeader
+        title={`SEA/J ${chapter}`}
+        breadcrumbs={[
+          { label: "TOP", href: "/" },
+          { label: "SEA/J", href: "/seaj" },
+          { label: chapter },
+        ]}
+      >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
       <Quiz key={page} questions={items} basePath="/seaj" />
