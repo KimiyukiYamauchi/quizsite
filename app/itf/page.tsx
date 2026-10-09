@@ -9,18 +9,17 @@ export const revalidate = 0; // ISR無効
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  searchParams?: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 };
 
 const PER_PAGE = 10;
 
 export default async function ITFPage({ searchParams }: PageProps) {
+  const { page: pageParam } = await searchParams;
   // 比較テスト
   // await debugFetchList("itf-questions", 1);
 
-  const current = Math.max(1, Number(searchParams?.page ?? 1) || 1);
-
-  const page = Math.max(1, Number(searchParams?.page ?? 1) || 1);
+  const page = Math.max(1, Number(pageParam ?? 1) || 1);
 
   // ← ここが offset/limit を使う呼び出し
   const { items, totalCount } = await getITFQuestionsPage(page, PER_PAGE);

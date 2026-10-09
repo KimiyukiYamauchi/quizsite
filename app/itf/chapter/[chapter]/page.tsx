@@ -4,13 +4,13 @@ import Quiz from "@/components/Quiz";
 import { getITFQuestionsByChapter } from "@/lib/microcms";
 
 type Props = {
-  params: { chapter: string };
+  params: Promise<{ chapter: string }>;
 };
 
 export const revalidate = 60;
 
 export default async function ITFChapterPage({ params }: Props) {
-  const chapter = decodeURIComponent(params.chapter);
+  const chapter = decodeURIComponent((await params).chapter);
 
   const { contents } = await getITFQuestionsByChapter(chapter, 100);
 

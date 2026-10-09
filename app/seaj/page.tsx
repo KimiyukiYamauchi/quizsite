@@ -9,13 +9,14 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 type PageProps = {
-  searchParams?: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 };
 
 const PER_PAGE = 10;
 
 export default async function SEAJPage({ searchParams }: PageProps) {
-  const page = Math.max(1, Number(searchParams?.page ?? 1) || 1);
+  const { page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam ?? 1) || 1);
 
   const { items, totalCount } = await getSEAJQuestionsPage(page, PER_PAGE);
 

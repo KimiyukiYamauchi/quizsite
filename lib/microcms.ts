@@ -1,5 +1,5 @@
 // lib/microcms.ts
-import { createClient } from "microcms-js-sdk";
+import { createClient, type MicroCMSQueries } from "microcms-js-sdk";
 
 // ==== 型定義（複数正解対応） ====
 export type ChoiceItem = {
@@ -85,7 +85,7 @@ function buildQueries(params: {
   q?: string;
   chapter?: string;
 }) {
-  const out: Record<string, any> = {};
+  const out: MicroCMSQueries = {};
   if (typeof params.limit === "number") out.limit = params.limit;
   if (typeof params.offset === "number") out.offset = params.offset;
   if (typeof params.q === "string" && params.q.length > 0) {
@@ -129,12 +129,12 @@ export async function getQuestions(params: {
       ...res,
       contents: res.contents.map(normalizeQuestion),
     };
-  } catch (e: any) {
+  } catch (e) {
     console.error("microCMS GET list failed:", {
       serviceDomain: SERVICE_DOMAIN,
       endpoint,
-      message: e?.message,
-      stack: e?.stack,
+      message: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
     });
     throw e;
   }
@@ -173,12 +173,12 @@ export async function getQuestionDetail(params: {
       customRequestInit: { cache: "no-store" as RequestCache },
     });
     return normalizeQuestion(q);
-  } catch (e: any) {
+  } catch (e) {
     console.error("microCMS GET detail failed:", {
       serviceDomain: SERVICE_DOMAIN,
       endpoint,
       contentId,
-      message: e?.message,
+      message: e instanceof Error ? e.message : String(e),
     });
     throw e;
   }
