@@ -112,6 +112,15 @@ export async function getQuestions(params: {
 }) {
   const { endpoint, limit = 50, offset = 0, q, chapter } = params;
 
+  // chapter は URL から来る値なので、filters に組み込む前に実在する章か照合する
+  // （"[or]..." などを含む値で絞り込み条件を書き換えられるのを防ぐ）
+  if (chapter !== undefined) {
+    const chapters = await getChapters(endpoint);
+    if (!chapters.includes(chapter)) {
+      return { contents: [], totalCount: 0, offset, limit };
+    }
+  }
+
   try {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
@@ -145,14 +154,36 @@ export async function getQuestions(params: {
   }
 }
 
+// エンドポイントに登録されている章の一覧（重複なし）を取得
+export async function getChapters(endpoint: string): Promise<string[]> {
+  const fetchPage = (offset: number) =>
+    microcmsClient.get<MicroCMSListResponse<Pick<Question, "chapter">>>({
+      endpoint,
+      queries: { fields: "chapter", limit: 100, offset },
+      customRequestInit: cacheOptions,
+    });
+
+  // 1回で取れるのは100件までなので、残りのページは並列で取得する
+  const first = await fetchPage(0);
+  const offsets: number[] = [];
+  for (let o = 100; o < first.totalCount; o += 100) offsets.push(o);
+  const rest = await Promise.all(offsets.map(fetchPage));
+
+  const chapters = [first, ...rest].flatMap((res) =>
+    res.contents.map((c) => c.chapter ?? "")
+  );
+  return Array.from(new Set(chapters.filter(Boolean)));
+}
+
 // 1ページ分だけ取得するヘルパー（perPageは100以下にしてね）
 export async function getQuestionsPage(params: {
   endpoint: string;
   page: number; // 1始まり
   perPage: number; // 100以下
   q?: string;
+  chapter?: string;
 }) {
-  const { endpoint, page, perPage, q } = params;
+  const { endpoint, page, perPage, q, chapter } = params;
   const current = Math.max(1, Math.floor(page) || 1);
   const limit = Math.min(100, Math.max(1, Math.floor(perPage) || 10));
   const offset = (current - 1) * limit;
@@ -162,6 +193,7 @@ export async function getQuestionsPage(params: {
     limit,
     offset,
     q,
+    chapter,
   });
   return { items: contents, totalCount, page: current, perPage: limit };
 }
@@ -215,20 +247,25 @@ export async function getSEAJQuestionsPage(page: number, perPage = 10) {
   return getQuestionsPage({ endpoint: "seaj-questions", page, perPage });
 }
 
-// ITF+：chapter 指定で問題一覧を取得
-export async function getITFQuestionsByChapter(chapter: string, limit = 100) {
-  return await getQuestions({
-    endpoint: "itf-questions",
-    limit,
-    chapter,
-  });
+// ITF+：chapter 指定で1ページ分の問題を取得
+export async function getITFQuestionsByChapterPage(
+  chapter: string,
+  page: number,
+  perPage = 10
+) {
+  return getQuestionsPage({ endpoint: "itf-questions", page, perPage, chapter });
 }
 
-// SEAJ：chapter 指定で問題一覧を取得
-export async function getSEAJQuestionsByChapter(chapter: string, limit = 100) {
-  return await getQuestions({
+// SEAJ：chapter 指定で1ページ分の問題を取得
+export async function getSEAJQuestionsByChapterPage(
+  chapter: string,
+  page: number,
+  perPage = 10
+) {
+  return getQuestionsPage({
     endpoint: "seaj-questions",
-    limit,
+    page,
+    perPage,
     chapter,
   });
 }
