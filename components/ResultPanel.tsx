@@ -9,7 +9,7 @@ type Props = {
 };
 
 export default function ResultPanel({ total, correct, onRetry }: Props) {
-  const score = Math.round((correct / total) * 100);
+  const score = total > 0 ? Math.round((correct / total) * 100) : 0;
   return (
     <div className={styles.result}>
       <p>

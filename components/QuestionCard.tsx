@@ -182,7 +182,7 @@ export default function QuestionCard({
           <button
             className={styles.submitBtn}
             onClick={handleSubmit}
-            disabled={submitted || selected == new Set()}
+            disabled={submitted || selected.size === 0}
           >
             回答する
           </button>
