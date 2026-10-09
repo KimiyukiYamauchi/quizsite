@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getITFQuestionsPage } from "@/lib/microcms";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
@@ -23,6 +24,9 @@ export default async function ITFPage({ searchParams }: PageProps) {
 
   // ← ここが offset/limit を使う呼び出し
   const { items, totalCount } = await getITFQuestionsPage(page, PER_PAGE);
+
+  // 範囲外のページ（?page=999 など）は 404
+  if (page > 1 && items.length === 0) notFound();
 
   return (
     <main className={styles.wrap}>
