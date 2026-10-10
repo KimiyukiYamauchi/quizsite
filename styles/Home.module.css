@@ -10,6 +10,7 @@
   margin-top: 16px;
 }
 .card {
+  position: relative; /* .link::after をカード全体に広げる基準 */
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 16px;
@@ -17,6 +18,11 @@
 }
 .card:hover {
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+/* キーボード操作時はカード全体にフォーカス枠を出す */
+.card:has(.link:focus-visible) {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 .title {
   font-size: 28px;
@@ -31,4 +37,14 @@
   margin-top: 8px;
   font-weight: 600;
   text-decoration: underline;
+}
+.link:focus-visible {
+  outline: none; /* 枠は .card 側に出す */
+}
+/* リンクのクリック範囲をカード全体に広げる */
+.link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
 }
