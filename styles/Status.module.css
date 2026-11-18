@@ -1,0 +1,71 @@
+/* エラー・404 ページ共通のスタイル */
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 64px 16px;
+  text-align: center;
+  color: #111111;
+}
+
+.code {
+  margin: 0;
+  font-size: 48px;
+  font-weight: 800;
+  color: #2563eb;
+  line-height: 1;
+}
+
+.title {
+  margin: 16px 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.desc {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.digest {
+  margin: 12px 0 0;
+  font-size: 0.85em;
+  color: #6b7280;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.primary,
+.secondary {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.primary {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.secondary {
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  color: #111111;
+}
+
+.primary:focus-visible,
+.secondary:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
