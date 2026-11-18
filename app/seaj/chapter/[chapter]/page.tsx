@@ -1,6 +1,10 @@
 // app/seaj/chapter/[chapter]/page.tsx
 import { notFound } from "next/navigation";
-import { getSEAJQuestionsByChapterPage } from "@/lib/microcms";
+import {
+  getChapterSummaries,
+  getSEAJQuestionsByChapterPage,
+} from "@/lib/microcms";
+import ChapterList from "@/components/ChapterList";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
 import StickyHeader from "@/components/StickyHeader";
@@ -18,11 +22,10 @@ export default async function SEAJChapterPage({ params, searchParams }: Props) {
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam ?? 1) || 1);
 
-  const { items, totalCount } = await getSEAJQuestionsByChapterPage(
-    chapter,
-    page,
-    PER_PAGE
-  );
+  const [{ items, totalCount }, chapters] = await Promise.all([
+    getSEAJQuestionsByChapterPage(chapter, page, PER_PAGE),
+    getChapterSummaries("seaj-questions"),
+  ]);
 
   // 存在しない章・範囲外のページは 404
   if (items.length === 0) notFound();
@@ -39,6 +42,11 @@ export default async function SEAJChapterPage({ params, searchParams }: Props) {
       >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
+      <ChapterList
+        chapters={chapters}
+        basePath="/seaj"
+        currentChapter={chapter}
+      />
       <Quiz key={page} questions={items} basePath="/seaj" />
     </main>
   );
