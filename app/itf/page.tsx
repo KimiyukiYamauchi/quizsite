@@ -1,52 +1,7 @@
-import { notFound } from "next/navigation";
-import { getChapterSummaries, getITFQuestionsPage } from "@/lib/microcms";
-import ChapterList from "@/components/ChapterList";
-import Quiz from "@/components/Quiz";
-import Pagination from "@/components/Pagination";
-import StickyHeader from "@/components/StickyHeader";
-import styles from "@/styles/Quiz.module.css";
+// app/itf/page.tsx
+// 中身は app/_exam/ExamPage.tsx（検定の設定は lib/exams.ts）
+import ExamPage, { type ExamPageProps } from "@/app/_exam/ExamPage";
 
-type PageProps = {
-  searchParams: Promise<{ page?: string }>;
-};
-
-const PER_PAGE = 10;
-
-export default async function ITFPage({ searchParams }: PageProps) {
-  const { page: pageParam } = await searchParams;
-  // 比較テスト
-  // await debugFetchList("itf-questions", 1);
-
-  const page = Math.max(1, Number(pageParam ?? 1) || 1);
-
-  // ← ここが offset/limit を使う呼び出し
-  const [{ items, totalCount }, chapters] = await Promise.all([
-    getITFQuestionsPage(page, PER_PAGE),
-    getChapterSummaries("itf-questions"),
-  ]);
-
-  // 範囲外のページ（?page=999 など）は 404
-  if (page > 1 && items.length === 0) notFound();
-
-  return (
-    <main className={styles.wrap}>
-      <StickyHeader
-        title="ITF+ 検定対策"
-        breadcrumbs={[{ label: "TOP", href: "/" }, { label: "ITF+" }]}
-      >
-        <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
-      </StickyHeader>
-      <ChapterList
-        chapters={chapters}
-        basePath="/itf"
-        defaultOpen={page === 1}
-      />
-      <Quiz
-        key={page} // 🔴 これがポイント：ページごとに別コンポーネント扱い
-        questions={items}
-        basePath="/itf"
-      />
-      {/* <Pagination total={totalCount} perPage={PER_PAGE} currentPage={current} /> */}
-    </main>
-  );
+export default function Page(props: ExamPageProps) {
+  return <ExamPage exam="itf" {...props} />;
 }

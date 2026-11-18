@@ -42,15 +42,15 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 - `error.tsx` --- エラー画面（microCMS に接続できないときなど）
 - `not-found.tsx` --- 404 画面
 
-#### app/itf
+#### app/_exam（問題ページの中身。ITF+ / SEA/J で共通）
 
-- `page.tsx` --- ITF+ の問題ページ
-- `chapter/[chapter]/page.tsx` --- ITF+ の章ごとの問題ページ
+- `ExamPage.tsx` --- 検定ごとの問題ページ
+- `ExamChapterPage.tsx` --- 検定ごと・章ごとの問題ページ
+- `_` で始まるフォルダはページとして公開されない
 
-#### app/seaj
+#### app/itf, app/seaj
 
-- `page.tsx` --- SEA/J の問題ページ
-- `chapter/[chapter]/page.tsx` --- SEA/J の章ごとの問題ページ
+- `page.tsx`、`chapter/[chapter]/page.tsx` --- 検定名を指定して `app/_exam` のページを表示するだけのファイル
 
 ### components
 
@@ -65,6 +65,11 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 
 - microCMS API から問題データを取得
 
+### lib/exams, lib/quizPage
+
+- `exams` --- 検定ごとの設定（URL・表示名・トップページの説明・microCMS のエンドポイント）
+- `quizPage` --- 問題ページで共通の値（1 ページの問題数、`?page=` の読み取り）
+
 ### lib/answerStore, lib/grading
 
 - `answerStore` --- 回答状態を localStorage に保存・読み込み
@@ -74,6 +79,12 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 
 - `json_to_microcms_csv.py` --- JSON → CSV 変換
 - `ping-microcms.cjs` --- microCMS 接続確認
+
+### 検定を追加するには
+
+1. microCMS に問題の API を作る（[microCMS の API 構成](#-microcms-の-api-構成) と同じフィールド構成）
+2. `lib/exams.ts` の `EXAMS` に 1 件追加する（トップページ・404 画面のリンクは自動で増える）
+3. `app/itf` をコピーして `app/<slug>` を作り、2 つの `page.tsx` の `exam="itf"` を新しい slug に変える
 
 ## 🛠 開発環境のセットアップ
 

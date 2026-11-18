@@ -4,7 +4,7 @@ import styles from "./ChapterList.module.css";
 
 type Props = {
   chapters: ChapterSummary[];
-  basePath: string; // ITFなら "/itf", SEAJなら "/seaj"
+  basePath: string; // 検定のパス（"/itf", "/seaj"）。lib/exams.ts の examPath()
   currentChapter?: string; // 章ページで表示中の章（強調表示する）
   defaultOpen?: boolean; // 最初から開いておくか
 };
