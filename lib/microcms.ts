@@ -18,8 +18,7 @@ export type Question = {
   chapter?: string;
   text: string;
   choices: ChoiceItem[];
-  // ★複数正解（リピータ）
-  answerId: AnswerItem[];
+  answerId: AnswerItem[]; // 正解（複数指定で複数正解）
   explanation?: string;
   // microCMSメタ
   createdAt?: string;
@@ -70,12 +69,6 @@ function normalizeQuestion(raw: Question): Question {
     .map((a) => ({ ...a, answerId: toLowerLetter(a.answerId) }))
     .filter((a) => a.answerId && !seen.has(a.answerId) && seen.add(a.answerId));
 
-  // console.log("Normalized question:", {
-  //   id: raw.id,
-  //   choices,
-  //   answerId,
-  // });
-
   return {
     ...raw,
     choices,
@@ -83,34 +76,29 @@ function normalizeQuestion(raw: Question): Question {
   };
 }
 
-// q / chapter を undefined で送らないユーティリティ
+// 未指定の値をクエリに含めないユーティリティ
 function buildQueries(params: {
   limit?: number;
   offset?: number;
-  q?: string;
   chapter?: string;
 }) {
   const out: MicroCMSQueries = {};
   if (typeof params.limit === "number") out.limit = params.limit;
   if (typeof params.offset === "number") out.offset = params.offset;
-  if (typeof params.q === "string" && params.q.length > 0) {
-    out.q = params.q;
-  }
   if (typeof params.chapter === "string" && params.chapter.length > 0) {
-    // ★ microCMS の filters 構文で chapter による絞り込み
+    // microCMS の filters 構文で chapter による絞り込み
     out.filters = `chapter[equals]${params.chapter}`;
   }
   return out;
 }
 
-export async function getQuestions(params: {
+async function getQuestions(params: {
   endpoint: string;
   limit?: number; // 100まで
   offset?: number; // (page-1)*perPage
-  q?: string;
-  chapter?: string; // ★追加
+  chapter?: string;
 }) {
-  const { endpoint, limit = 50, offset = 0, q, chapter } = params;
+  const { endpoint, limit = 50, offset = 0, chapter } = params;
 
   // chapter は URL から来る値なので、filters に組み込む前に実在する章か照合する
   // （"[or]..." などを含む値で絞り込み条件を書き換えられるのを防ぐ）
@@ -124,20 +112,9 @@ export async function getQuestions(params: {
   try {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
-      queries: buildQueries({ limit, offset, q, chapter }),
+      queries: buildQueries({ limit, offset, chapter }),
       customRequestInit: cacheOptions,
     });
-
-    // ★ ここで実ログ
-    // console.log(
-    //   "[microcms] serviceDomain=",
-    //   process.env.MICROCMS_SERVICE_DOMAIN,
-    //   " endpoint=",
-    //   endpoint,
-    //   " totalCount=",
-    //   res.totalCount,
-    //   " contents.length=",
-    //   res.contents?.length
 
     return {
       ...res,
@@ -173,7 +150,7 @@ export async function getChapterSummaries(
 }
 
 // エンドポイントに登録されている章の一覧（重複なし）を取得
-export async function getChapters(endpoint: string): Promise<string[]> {
+async function getChapters(endpoint: string): Promise<string[]> {
   return Array.from(new Set(await getChapterNames(endpoint)));
 }
 
@@ -197,15 +174,14 @@ async function getChapterNames(endpoint: string): Promise<string[]> {
     .filter(Boolean);
 }
 
-// 1ページ分だけ取得するヘルパー（perPageは100以下にしてね）
+// 1ページ分だけ取得するヘルパー（perPage は 100 以下）
 export async function getQuestionsPage(params: {
   endpoint: string;
   page: number; // 1始まり
   perPage: number; // 100以下
-  q?: string;
   chapter?: string;
 }) {
-  const { endpoint, page, perPage, q, chapter } = params;
+  const { endpoint, page, perPage, chapter } = params;
   const current = Math.max(1, Math.floor(page) || 1);
   const limit = Math.min(100, Math.max(1, Math.floor(perPage) || 10));
   const offset = (current - 1) * limit;
@@ -214,57 +190,7 @@ export async function getQuestionsPage(params: {
     endpoint,
     limit,
     offset,
-    q,
     chapter,
   });
   return { items: contents, totalCount, page: current, perPage: limit };
-}
-
-export async function getQuestionDetail(params: {
-  endpoint: string;
-  contentId: string;
-}) {
-  const { endpoint, contentId } = params;
-  try {
-    const q = await microcmsClient.get<Question>({
-      endpoint,
-      contentId,
-      customRequestInit: cacheOptions,
-    });
-    return normalizeQuestion(q);
-  } catch (e) {
-    console.error("microCMS GET detail failed:", {
-      serviceDomain: SERVICE_DOMAIN,
-      endpoint,
-      contentId,
-      message: e instanceof Error ? e.message : String(e),
-    });
-    throw e;
-  }
-}
-
-// lib/microcms.ts に試験関数を追加（不要になったら削除OK）
-export async function debugFetchList(endpoint: string, limit = 1) {
-  const domain = process.env.MICROCMS_SERVICE_DOMAIN!;
-  const key = process.env.MICROCMS_API_KEY!;
-  const url = `https://${domain}.microcms.io/api/v1/${endpoint}?limit=${limit}`;
-
-  const res = await fetch(url, {
-    headers: { "X-MICROCMS-API-KEY": key },
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`HTTP ${res.status}: ${text}`);
-  }
-  const json = (await res.json()) as MicroCMSListResponse<Question>;
-  console.log(
-    "[debugFetchList]",
-    endpoint,
-    "totalCount=",
-    json.totalCount,
-    "len=",
-    json.contents?.length,
-  );
-  return json;
 }

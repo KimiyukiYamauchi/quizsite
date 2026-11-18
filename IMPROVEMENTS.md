@@ -23,12 +23,14 @@
   - `app/itf`・`app/seaj` は検定名を渡すだけの数行のファイルにした
     （`app/[exam]` にすると、本番で `/abc` のような存在しない URL も HTTP 200 になるため。今は HTTP 404）
   - `lib/microcms.ts` の `getITF…` / `getSEAJ…` ラッパーは削除
-- [ ] **使われていないコードを削除する**
-  - [ ] `lib/microcms.ts` の `debugFetchList`、`getQuestionDetail`
+- [x] **使われていないコードを削除する**
+  - [x] `lib/microcms.ts` の `debugFetchList`、`getQuestionDetail`
   - [x] `lib/microcms.ts` の `getITFQuestions`、`getSEAJQuestions`（共通化で削除）
-  - [ ] `lib/microcms.ts` のコメントアウトした `console.log` と、使われていない `q`（検索）引数
+  - [x] `lib/microcms.ts` のコメントアウトした `console.log` と、使われていない `q`（検索）引数
   - [x] `app/itf/page.tsx` のデバッグ呼び出しのコメント（共通化で削除）
-  - [ ] `app/page.module.css`、`public/vercel.svg`、`public/next.svg`（create-next-app の雛形の残り）
+  - [x] `app/page.module.css`、`public/vercel.svg`、`public/next.svg`（create-next-app の雛形の残り）
+  - [x] `app/globals.css` の雛形の CSS 変数（`--primary-glow` など）
+  - [x] `styles/Quiz.module.css` の `.wrap` 以外のクラスと、`QuestionCard.module.css` の `.chapter`
 - [ ] **API キーの保護を確実にする**
   - `lib/microcms.ts` に `import "server-only"` を追加する
 - [ ] **不要な `"use client"` を外す**
@@ -64,5 +66,5 @@
 - [ ] 問題や選択肢の順番をシャッフルする
 - [ ] 間違えた問題だけを解き直すモード（「回答状態を保存する」が前提）
 - [ ] 試験本番のように、制限時間付きで最後にまとめて採点するモード
-- [ ] 問題文の検索（microCMS の `q` を使えば、今の `getQuestions` を活かせる）
+- [ ] 問題文の検索（microCMS の `q` クエリを `lib/microcms.ts` の `buildQueries` に足せば実現できる）
 - [ ] 章ごとの進み具合（正答率）を章一覧に表示する
