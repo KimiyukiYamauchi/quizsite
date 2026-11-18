@@ -4,10 +4,9 @@
 
 - [x] **章を選ぶ一覧を追加する**（PR #10）
   - `/itf`・`/seaj` と章ページに、問題数つきの章一覧を表示
-- [ ] **回答状態を保存する**
-  - 今は `Quiz.tsx` の `useState` だけなので、ページを移動したり再読み込みすると消える
-  - `localStorage` に「問題 ID ごとの正誤」を保存する
-  - 保存した記録を、間違えた問題の解き直しや章ごとの進み具合の表示に使う
+- [x] **回答状態を保存する**
+  - `localStorage` に試験ごと（itf / seaj）の「問題 ID → 選んだ選択肢」を保存し、再読み込みやページ移動後も回答済みとして表示する
+  - 保存した記録は、間違えた問題の解き直しや章ごとの進み具合の表示にも使える
 - [ ] **結果表示を分かりやすくする**
   - `ResultPanel.tsx` は、未回答の問題も含めた `正答数 / 10問` と点数を最初から表示している
   - 「回答済み ◯問」を表示する、または全問回答後に点数を出す
@@ -39,9 +38,9 @@
 ## 優先度：低（細かい品質）
 
 - [ ] **`QuestionCard.tsx` を整理する**
-  - [ ] `<button onClick={handleSubmit}>` と `<form onSubmit>` で同じ処理を二重に登録している → `onClick` は外して `type="submit"` にする
-  - [ ] `toggle` を `useState` より後ろに移す
-  - [ ] `correctSet` での小文字化をやめる（`normalizeQuestion` で済んでいる）
+  - [x] `<button onClick={handleSubmit}>` と `<form onSubmit>` で同じ処理を二重に登録している → `onClick` は外して `type="submit"` にする
+  - [x] `toggle` を `useState` より後ろに移す
+  - [x] `correctSet` での小文字化をやめる（`normalizeQuestion` で済んでいる）
   - [ ] 正解が 0 件の問題（どう答えても正解にならない）をデータ側で検証する
 - [ ] **ページネーションの「前へ／次へ」を直す**
   - 最初・最後のページでは `aria-disabled` を付けているが、リンクとしては押せる → `<span>` にする
