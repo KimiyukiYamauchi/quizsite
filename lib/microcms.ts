@@ -1,31 +1,10 @@
 // lib/microcms.ts
+// microCMS から問題データを取得する（サーバー専用）
+// API キーを扱うので、クライアントコンポーネントから import するとビルドエラーにする
+import "server-only";
 import { createClient, type MicroCMSQueries } from "microcms-js-sdk";
-
-// ==== 型定義（複数正解対応） ====
-export type ChoiceItem = {
-  fieldId?: string; // "choices"
-  selectId: string; // a / b / c ...
-  text: string;
-};
-
-export type AnswerItem = {
-  fieldId?: string; // "answerId"
-  answerId: string; // a / b / c ...
-};
-
-export type Question = {
-  id: string;
-  chapter?: string;
-  text: string;
-  choices: ChoiceItem[];
-  answerId: AnswerItem[]; // 正解（複数指定で複数正解）
-  explanation?: string;
-  // microCMSメタ
-  createdAt?: string;
-  updatedAt?: string;
-  publishedAt?: string;
-  revisedAt?: string;
-};
+// 型は lib/types.ts に置いている（クライアントコンポーネントからも使うため）
+import type { ChapterSummary, Question } from "@/lib/types";
 
 export type MicroCMSListResponse<T> = {
   contents: T[];
@@ -130,11 +109,6 @@ async function getQuestions(params: {
     throw e;
   }
 }
-
-export type ChapterSummary = {
-  name: string; // 章の名前（例: "第1章 ITの概要と専門用語"）
-  count: number; // その章の問題数
-};
 
 // 章の一覧を問題数つきで取得（「第2章」が「第10章」より前に来るよう数値を考慮して並べる）
 export async function getChapterSummaries(

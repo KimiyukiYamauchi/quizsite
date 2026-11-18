@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { Question } from "@/lib/microcms";
+import type { Question } from "@/lib/types";
 import {
   answerStorageKey,
   clearAnswers,

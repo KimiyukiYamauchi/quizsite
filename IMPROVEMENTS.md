@@ -31,8 +31,9 @@
   - [x] `app/page.module.css`、`public/vercel.svg`、`public/next.svg`（create-next-app の雛形の残り）
   - [x] `app/globals.css` の雛形の CSS 変数（`--primary-glow` など）
   - [x] `styles/Quiz.module.css` の `.wrap` 以外のクラスと、`QuestionCard.module.css` の `.chapter`
-- [ ] **API キーの保護を確実にする**
-  - `lib/microcms.ts` に `import "server-only"` を追加する
+- [x] **API キーの保護を確実にする**
+  - `lib/microcms.ts` に `import "server-only"` を追加（クライアントコンポーネントから import するとビルドエラー）
+  - 問題データの型を `lib/types.ts` に分け、クライアントコンポーネントは `lib/microcms.ts` を参照しないようにした
 - [ ] **不要な `"use client"` を外す**
   - [ ] `StickyHeader.tsx`（状態を持たない）
   - [ ] `Pagination.tsx`（`basePath` を props で受け取れば `useSearchParams` は不要）

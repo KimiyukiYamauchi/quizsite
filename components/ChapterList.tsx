@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { ChapterSummary } from "@/lib/microcms";
+import type { ChapterSummary } from "@/lib/types";
 import styles from "./ChapterList.module.css";
 
 type Props = {

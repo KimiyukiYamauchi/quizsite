@@ -1,6 +1,6 @@
 // lib/grading.ts
 // 採点ロジック（QuestionCard と Quiz の両方で使う）
-import type { Question } from "@/lib/microcms";
+import type { Question } from "@/lib/types";
 
 // 正解の selectId の集合
 export const correctAnswerSet = (question: Question) =>

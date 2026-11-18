@@ -3,7 +3,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import type { Question } from "@/lib/microcms";
+import type { Question } from "@/lib/types";
 import type { AnswerRecord } from "@/lib/answerStore";
 import { correctAnswerSet, isSameSet } from "@/lib/grading";
 import styles from "@/components/QuestionCard.module.css";
