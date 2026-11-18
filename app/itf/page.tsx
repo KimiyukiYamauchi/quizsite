@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { getITFQuestionsPage } from "@/lib/microcms";
+import { getChapterSummaries, getITFQuestionsPage } from "@/lib/microcms";
+import ChapterList from "@/components/ChapterList";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
 import StickyHeader from "@/components/StickyHeader";
@@ -19,7 +20,10 @@ export default async function ITFPage({ searchParams }: PageProps) {
   const page = Math.max(1, Number(pageParam ?? 1) || 1);
 
   // ← ここが offset/limit を使う呼び出し
-  const { items, totalCount } = await getITFQuestionsPage(page, PER_PAGE);
+  const [{ items, totalCount }, chapters] = await Promise.all([
+    getITFQuestionsPage(page, PER_PAGE),
+    getChapterSummaries("itf-questions"),
+  ]);
 
   // 範囲外のページ（?page=999 など）は 404
   if (page > 1 && items.length === 0) notFound();
@@ -32,6 +36,11 @@ export default async function ITFPage({ searchParams }: PageProps) {
       >
         <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
       </StickyHeader>
+      <ChapterList
+        chapters={chapters}
+        basePath="/itf"
+        defaultOpen={page === 1}
+      />
       <Quiz
         key={page} // 🔴 これがポイント：ページごとに別コンポーネント扱い
         questions={items}

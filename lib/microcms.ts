@@ -40,7 +40,7 @@ const API_KEY = process.env.MICROCMS_API_KEY;
 
 if (!SERVICE_DOMAIN || !API_KEY) {
   throw new Error(
-    "MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY が未設定です（.env.local を確認）"
+    "MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY が未設定です（.env.local を確認）",
   );
 }
 
@@ -154,8 +154,31 @@ export async function getQuestions(params: {
   }
 }
 
+export type ChapterSummary = {
+  name: string; // 章の名前（例: "第1章 ITの概要と専門用語"）
+  count: number; // その章の問題数
+};
+
+// 章の一覧を問題数つきで取得（「第2章」が「第10章」より前に来るよう数値を考慮して並べる）
+export async function getChapterSummaries(
+  endpoint: string,
+): Promise<ChapterSummary[]> {
+  const counts = new Map<string, number>();
+  for (const name of await getChapterNames(endpoint)) {
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  return Array.from(counts, ([name, count]) => ({ name, count })).sort((a, b) =>
+    a.name.localeCompare(b.name, "ja", { numeric: true }),
+  );
+}
+
 // エンドポイントに登録されている章の一覧（重複なし）を取得
 export async function getChapters(endpoint: string): Promise<string[]> {
+  return Array.from(new Set(await getChapterNames(endpoint)));
+}
+
+// 全問題の chapter を（重複ありのまま）取得
+async function getChapterNames(endpoint: string): Promise<string[]> {
   const fetchPage = (offset: number) =>
     microcmsClient.get<MicroCMSListResponse<Pick<Question, "chapter">>>({
       endpoint,
@@ -169,10 +192,9 @@ export async function getChapters(endpoint: string): Promise<string[]> {
   for (let o = 100; o < first.totalCount; o += 100) offsets.push(o);
   const rest = await Promise.all(offsets.map(fetchPage));
 
-  const chapters = [first, ...rest].flatMap((res) =>
-    res.contents.map((c) => c.chapter ?? "")
-  );
-  return Array.from(new Set(chapters.filter(Boolean)));
+  return [first, ...rest]
+    .flatMap((res) => res.contents.map((c) => c.chapter ?? ""))
+    .filter(Boolean);
 }
 
 // 1ページ分だけ取得するヘルパー（perPageは100以下にしてね）
@@ -251,16 +273,21 @@ export async function getSEAJQuestionsPage(page: number, perPage = 10) {
 export async function getITFQuestionsByChapterPage(
   chapter: string,
   page: number,
-  perPage = 10
+  perPage = 10,
 ) {
-  return getQuestionsPage({ endpoint: "itf-questions", page, perPage, chapter });
+  return getQuestionsPage({
+    endpoint: "itf-questions",
+    page,
+    perPage,
+    chapter,
+  });
 }
 
 // SEAJ：chapter 指定で1ページ分の問題を取得
 export async function getSEAJQuestionsByChapterPage(
   chapter: string,
   page: number,
-  perPage = 10
+  perPage = 10,
 ) {
   return getQuestionsPage({
     endpoint: "seaj-questions",
@@ -291,7 +318,7 @@ export async function debugFetchList(endpoint: string, limit = 1) {
     "totalCount=",
     json.totalCount,
     "len=",
-    json.contents?.length
+    json.contents?.length,
   );
   return json;
 }
