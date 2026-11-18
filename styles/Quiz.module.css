@@ -49,8 +49,7 @@
 .wrong {
   background: #fee2e2;
 }
-.submit,
-.retry {
+.submit {
   padding: 8px 12px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -68,12 +67,4 @@
   border: 1px dashed #cbd5e1;
   border-radius: 8px;
   padding: 8px 12px;
-}
-.result {
-  position: sticky;
-  bottom: 16px;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 12px;
 }

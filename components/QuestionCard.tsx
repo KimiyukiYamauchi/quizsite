@@ -16,6 +16,8 @@ type Props = {
   question: Question;
   // 例："問題 x / n" 等を任意で表示したい時
   indexLabel?: string;
+  // カードに付ける id（ページ内リンクの飛び先）
+  anchorId?: string;
   // 正解表示モード（自動採点後に解説まで出すかどうか）
   showExplanationAfterSubmit?: boolean;
   // 保存済みの回答（あれば回答済みとして表示する）
@@ -28,6 +30,7 @@ type Props = {
 export default function QuestionCard({
   question,
   indexLabel,
+  anchorId,
   showExplanationAfterSubmit = true,
   saved,
   onAnswered,
@@ -80,7 +83,7 @@ export default function QuestionCard({
   };
 
   return (
-    <div className={styles.card}>
+    <div id={anchorId} className={styles.card}>
       <header className={styles.header}>
         {indexLabel && <span className={styles.index}>{indexLabel}</span>}
         {question.chapter && (
