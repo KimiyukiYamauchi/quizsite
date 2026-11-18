@@ -24,7 +24,7 @@ type Props = {
   saved?: AnswerRecord;
   // 回答したときに選んだ選択肢を渡す（保存・採点は親で行う）
   onAnswered: (selected: string[]) => void;
-  basePath: string; // ★ 追加：ITFなら "/itf", SEAJなら "/seaj"
+  basePath: string; // 検定のパス（"/itf", "/seaj"）。lib/exams.ts の examPath()
 };
 
 export default function QuestionCard({

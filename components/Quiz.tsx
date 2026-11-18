@@ -14,7 +14,7 @@ import ResultPanel from "@/components/ResultPanel";
 
 type Props = {
   questions: Question[];
-  basePath: string; // ★ 追加：ITFなら "/itf", SEAJなら "/seaj"
+  basePath: string; // 検定のパス（"/itf", "/seaj"）。lib/exams.ts の examPath()
 };
 
 export default function Quiz({ questions, basePath }: Props) {

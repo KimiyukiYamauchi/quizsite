@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DocumentTitle from "@/components/DocumentTitle";
+import { EXAMS, examPath } from "@/lib/exams";
 import styles from "@/styles/Status.module.css";
 
 const TITLE = "ページが見つかりません | 検定対策";
@@ -24,12 +25,15 @@ export default function NotFound() {
         <Link className={styles.primary} href="/">
           TOP へ戻る
         </Link>
-        <Link className={styles.secondary} href="/itf">
-          ITF+ の問題へ
-        </Link>
-        <Link className={styles.secondary} href="/seaj">
-          SEA/J の問題へ
-        </Link>
+        {EXAMS.map((exam) => (
+          <Link
+            key={exam.slug}
+            className={styles.secondary}
+            href={examPath(exam)}
+          >
+            {exam.name} の問題へ
+          </Link>
+        ))}
       </div>
     </main>
   );

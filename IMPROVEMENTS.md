@@ -18,14 +18,16 @@
 
 ## 優先度：中（設計・保守性）
 
-- [ ] **ITF+ と SEA/J のページを共通化する**
-  - `app/itf/**` と `app/seaj/**` の 4 ファイルは、ほぼ同じコード
-  - 試験ごとの設定（エンドポイント・表示名）を 1 か所にまとめ、`app/[exam]/...` と `generateStaticParams` で 1 本にする
-  - `lib/microcms.ts` の `getITF…` / `getSEAJ…` ラッパーも整理する
+- [x] **ITF+ と SEA/J のページを共通化する**
+  - 検定ごとの設定を `lib/exams.ts` にまとめ、ページの中身を `app/_exam/` の 2 ファイルに共通化
+  - `app/itf`・`app/seaj` は検定名を渡すだけの数行のファイルにした
+    （`app/[exam]` にすると、本番で `/abc` のような存在しない URL も HTTP 200 になるため。今は HTTP 404）
+  - `lib/microcms.ts` の `getITF…` / `getSEAJ…` ラッパーは削除
 - [ ] **使われていないコードを削除する**
-  - [ ] `lib/microcms.ts` の `debugFetchList`、`getQuestionDetail`、`getITFQuestions`、`getSEAJQuestions`
+  - [ ] `lib/microcms.ts` の `debugFetchList`、`getQuestionDetail`
+  - [x] `lib/microcms.ts` の `getITFQuestions`、`getSEAJQuestions`（共通化で削除）
   - [ ] `lib/microcms.ts` のコメントアウトした `console.log` と、使われていない `q`（検索）引数
-  - [ ] `app/itf/page.tsx` のデバッグ呼び出しのコメント
+  - [x] `app/itf/page.tsx` のデバッグ呼び出しのコメント（共通化で削除）
   - [ ] `app/page.module.css`、`public/vercel.svg`、`public/next.svg`（create-next-app の雛形の残り）
 - [ ] **API キーの保護を確実にする**
   - `lib/microcms.ts` に `import "server-only"` を追加する

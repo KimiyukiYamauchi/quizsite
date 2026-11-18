@@ -243,60 +243,6 @@ export async function getQuestionDetail(params: {
   }
 }
 
-// ===========================
-// ITF+, SEAJ 向けラッパー
-// ===========================
-
-// ITF+ 検定問題一覧を取得
-export async function getITFQuestions(limit = 50) {
-  return await getQuestions({
-    endpoint: "itf-questions",
-    limit,
-  });
-}
-export async function getITFQuestionsPage(page: number, perPage = 10) {
-  return getQuestionsPage({ endpoint: "itf-questions", page, perPage });
-}
-
-// SEAJ 検定問題一覧を取得
-export async function getSEAJQuestions(limit = 50) {
-  return await getQuestions({
-    endpoint: "seaj-questions",
-    limit,
-  });
-}
-export async function getSEAJQuestionsPage(page: number, perPage = 10) {
-  return getQuestionsPage({ endpoint: "seaj-questions", page, perPage });
-}
-
-// ITF+：chapter 指定で1ページ分の問題を取得
-export async function getITFQuestionsByChapterPage(
-  chapter: string,
-  page: number,
-  perPage = 10,
-) {
-  return getQuestionsPage({
-    endpoint: "itf-questions",
-    page,
-    perPage,
-    chapter,
-  });
-}
-
-// SEAJ：chapter 指定で1ページ分の問題を取得
-export async function getSEAJQuestionsByChapterPage(
-  chapter: string,
-  page: number,
-  perPage = 10,
-) {
-  return getQuestionsPage({
-    endpoint: "seaj-questions",
-    page,
-    perPage,
-    chapter,
-  });
-}
-
 // lib/microcms.ts に試験関数を追加（不要になったら削除OK）
 export async function debugFetchList(endpoint: string, limit = 1) {
   const domain = process.env.MICROCMS_SERVICE_DOMAIN!;
