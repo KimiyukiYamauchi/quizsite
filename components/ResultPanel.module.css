@@ -1,0 +1,96 @@
+.panel {
+  position: sticky;
+  bottom: 16px;
+  display: grid;
+  gap: 8px;
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+/* 全問回答したら目立たせる */
+.finished {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.status {
+  min-width: 0;
+}
+
+.summary {
+  margin: 0;
+}
+
+.summary strong {
+  font-size: 1.2em;
+}
+
+.score {
+  font-weight: 700;
+}
+
+.detail {
+  color: #4b5563;
+  font-size: 0.9em;
+}
+
+.retry {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #ffffff;
+  color: inherit;
+}
+
+.retry:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bar {
+  height: 6px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  background: #2563eb;
+  transition: width 0.2s ease;
+}
+
+.unanswered {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 0.9em;
+  color: #4b5563;
+}
+
+.jump {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill {
+    transition: none;
+  }
+}

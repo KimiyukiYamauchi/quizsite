@@ -1,5 +1,7 @@
 /* components/QuestionCard.module.css (例) */
 .card {
+  /* ページ内リンクで飛んだとき、上部に固定したヘッダーに隠れないようにする */
+  scroll-margin-top: 180px;
   padding: 16px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -101,4 +103,11 @@
   background: #f9fafb;
   padding: 12px;
   border-radius: 8px;
+}
+
+/* 狭い画面ではヘッダー（パンくず・ページネーション）が折り返して高くなるため余白を広げる */
+@media (max-width: 600px) {
+  .card {
+    scroll-margin-top: 240px;
+  }
 }
