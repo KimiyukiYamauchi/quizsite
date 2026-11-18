@@ -13,11 +13,13 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 ## 🚀 主な機能
 
 - ITF+／SEA/J それぞれの問題練習が可能
-- 問題を解いてスコアを確認できる
+- 回答すると、その場で正誤と解説を表示
+- 画面下の結果パネルで回答の進み具合（回答済み ◯ / 10 問、正解・不正解の数）を確認でき、未回答の問題へ移動できる。全問回答すると正答数と点数を表示
 - 章の一覧（問題数つき）から章ごとの問題を選んで解ける
 - 1 ページに 10 問で、ページネーション対応
 - 回答はブラウザ（localStorage）に保存され、再読み込みやページ移動後も残る（「もう一度チャレンジ」でそのページの回答をリセット）
 - 複数正解の問題にも対応（正解が複数ある問題はチェックボックスで回答）
+- 読み込み中・エラー・404 の専用画面
 
 ## 🗺 ページ構成
 
@@ -54,37 +56,35 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 
 ### components
 
-- `Quiz` --- クイズ全体コンポーネント
-- `QuestionCard` --- 問題表示コンポーネント
-- `ResultPanel` --- 正解数表示
-- `Pagination` --- ページ送り
-- `StickyHeader` --- 問題ヘッダー
+- `Quiz` --- クイズ全体（回答の保存・正答数の集計）
+- `QuestionCard` --- 1 問分の表示と回答
+- `ResultPanel` --- 画面下の結果パネル（進み具合・未回答の問題へのリンク・点数）
 - `ChapterList` --- 章の一覧（章ごとのページへのリンク）
+- `Pagination` --- ページ送り
+- `StickyHeader` --- 画面上部に固定するヘッダー（タイトル・パンくず・ページ送り）
+- `Breadcrumb` --- パンくずリスト
+- `DocumentTitle` --- ブラウザのタブのタイトルを差し替える（404・エラー画面で使用）
 
-### lib/microcms
+### lib
 
-- microCMS API から問題データを取得
+- `microcms.ts` --- microCMS API から問題データ・章の一覧を取得
+- `exams.ts` --- 検定ごとの設定（URL・表示名・トップページの説明・microCMS のエンドポイント）
+- `quizPage.ts` --- 問題ページで共通の値（1 ページの問題数、`?page=` の読み取り）
+- `answerStore.ts` --- 回答状態を localStorage に保存・読み込み
+- `grading.ts` --- 採点ロジック（正解との一致判定）
 
-### lib/exams, lib/quizPage
+### styles
 
-- `exams` --- 検定ごとの設定（URL・表示名・トップページの説明・microCMS のエンドポイント）
-- `quizPage` --- 問題ページで共通の値（1 ページの問題数、`?page=` の読み取り）
-
-### lib/answerStore, lib/grading
-
-- `answerStore` --- 回答状態を localStorage に保存・読み込み
-- `grading` --- 採点ロジック（正解との一致判定）
+- `Home.module.css` --- トップページ
+- `Quiz.module.css` --- 問題ページ全体
+- `Loading.module.css` --- 読み込み中の画面
+- `Status.module.css` --- エラー・404 画面
+- 各コンポーネントのスタイルは `components/` に同じ名前で置いている
 
 ### scripts
 
 - `json_to_microcms_csv.py` --- JSON → CSV 変換
 - `ping-microcms.cjs` --- microCMS 接続確認
-
-### 検定を追加するには
-
-1. microCMS に問題の API を作る（[microCMS の API 構成](#-microcms-の-api-構成) と同じフィールド構成）
-2. `lib/exams.ts` の `EXAMS` に 1 件追加する（トップページ・404 画面のリンクは自動で増える）
-3. `app/itf` をコピーして `app/<slug>` を作り、2 つの `page.tsx` の `exam="itf"` を新しい slug に変える
 
 ## 🛠 開発環境のセットアップ
 
@@ -170,6 +170,13 @@ npm run dev
 python scripts/json_to_microcms_csv.py <input_json> <output_csv>
 ```
 
+## ➕ 検定を追加するには
+
+1. microCMS に問題の API を作る（上と同じフィールド構成）
+2. `lib/exams.ts` の `EXAMS` に 1 件追加する（トップページ・404 画面のリンクは自動で増える）
+3. `app/itf` をコピーして `app/<slug>` を作り、2 つの `page.tsx` の `exam="itf"` を新しい slug に変える
+4. 接続確認に使う場合は、`scripts/ping-microcms.cjs` のエンドポイントの一覧にも追加する
+
 ## 📦 使用技術
 
 - Next.js 16（App Router）
@@ -178,3 +185,7 @@ python scripts/json_to_microcms_csv.py <input_json> <output_csv>
 - CSS Modules
 - microCMS
 - Vercel
+
+## 📝 改善点
+
+今後の改善点・機能追加のアイデアは [IMPROVEMENTS.md](IMPROVEMENTS.md) にチェックリストでまとめています。
