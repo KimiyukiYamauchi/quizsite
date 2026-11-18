@@ -67,7 +67,8 @@ ITF+ と SEA/J の練習問題を解くことができる Web サイトのソー
 
 ### lib
 
-- `microcms.ts` --- microCMS API から問題データ・章の一覧を取得
+- `microcms.ts` --- microCMS API から問題データ・章の一覧を取得（サーバー専用。クライアントコンポーネントから import するとビルドエラー）
+- `types.ts` --- 問題データの型（クライアントコンポーネントからはこちらを import する）
 - `exams.ts` --- 検定ごとの設定（URL・表示名・トップページの説明・microCMS のエンドポイント）
 - `quizPage.ts` --- 問題ページで共通の値（1 ページの問題数、`?page=` の読み取り）
 - `answerStore.ts` --- 回答状態を localStorage に保存・読み込み
