@@ -9,11 +9,13 @@ import ChapterList from "@/components/ChapterList";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
 import StickyHeader from "@/components/StickyHeader";
+import ShuffleControl from "@/components/ShuffleControl";
+import { parseShuffleSeed } from "@/lib/shuffle";
 import styles from "@/styles/Quiz.module.css";
 
 export type ExamChapterPageProps = {
   params: Promise<{ chapter: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; shuffle?: string | string[] }>;
 };
 
 type Props = ExamChapterPageProps & { exam: ExamSlug };
@@ -25,8 +27,11 @@ export default async function ExamChapterPage({
 }: Props) {
   const exam = getExam(slug);
   const chapter = decodeURIComponent((await params).chapter);
-  const page = parsePage((await searchParams).page);
+  const query = await searchParams;
+  const page = parsePage(query.page);
+  const shuffleSeed = parseShuffleSeed(query.shuffle); // ?shuffle= のシード（なければ元の順番）
   const basePath = examPath(exam);
+  const chapterPath = `${basePath}/chapter/${encodeURIComponent(chapter)}`;
 
   const [{ items, totalCount }, chapters] = await Promise.all([
     getQuestionsPage({
@@ -34,6 +39,7 @@ export default async function ExamChapterPage({
       page,
       perPage: PER_PAGE,
       chapter,
+      shuffleSeed,
     }),
     getChapterSummaries(exam.endpoint),
   ]);
@@ -52,18 +58,24 @@ export default async function ExamChapterPage({
         ]}
       >
         <Pagination
-          path={`${basePath}/chapter/${encodeURIComponent(chapter)}`}
+          path={chapterPath}
+          query={{ shuffle: shuffleSeed }}
           total={totalCount}
           perPage={PER_PAGE}
           currentPage={page}
         />
       </StickyHeader>
+      <ShuffleControl path={chapterPath} seed={shuffleSeed} />
       <ChapterList
         chapters={chapters}
         basePath={basePath}
         currentChapter={chapter}
       />
-      <Quiz key={page} questions={items} basePath={basePath} />
+      <Quiz
+        key={`${shuffleSeed}:${page}`} // 並び・ページごとに別コンポーネント扱いにして state を初期化する
+        questions={items}
+        basePath={basePath}
+      />
     </main>
   );
 }
