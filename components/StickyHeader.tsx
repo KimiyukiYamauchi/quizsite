@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 import Breadcrumb, { type Crumb } from "./Breadcrumb";
 import styles from "./StickyHeader.module.css";

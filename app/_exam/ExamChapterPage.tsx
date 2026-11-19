@@ -51,7 +51,12 @@ export default async function ExamChapterPage({
           { label: chapter },
         ]}
       >
-        <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
+        <Pagination
+          path={`${basePath}/chapter/${encodeURIComponent(chapter)}`}
+          total={totalCount}
+          perPage={PER_PAGE}
+          currentPage={page}
+        />
       </StickyHeader>
       <ChapterList
         chapters={chapters}
