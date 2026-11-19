@@ -6,3 +6,19 @@
   background-color: #ffffff; /* 白で固定 */
   color: #111111; /* ほぼ黒で固定 */
 }
+
+/* 検索結果の件数・見つからなかったときの表示 */
+.searchInfo {
+  margin: 0 0 16px;
+  color: #374151;
+}
+
+.empty {
+  margin: 0 0 16px;
+  padding: 24px 16px;
+  border: 1px dashed #d1d5db;
+  border-radius: 12px;
+  text-align: center;
+  color: #4b5563;
+  line-height: 1.7;
+}

@@ -3,6 +3,7 @@ import styles from "./Pagination.module.css";
 
 type Props = {
   path: string; // リンク先のパス（例: "/itf"、"/itf/chapter/..."）。?page= はこのコンポーネントが付ける
+  query?: Record<string, string>; // ページを移っても残したいクエリ（例: 検索語 { q: "暗号" }）
   total: number; // 全件数
   perPage?: number; // 1ページの件数（デフォ10）
   currentPage: number; // 現在ページ(1始まり)
@@ -11,6 +12,7 @@ type Props = {
 // サーバーコンポーネント（パスはページから受け取るので、ブラウザ側の処理は不要）
 export default function Pagination({
   path,
+  query = {},
   total,
   perPage = 10,
   currentPage,
@@ -19,8 +21,12 @@ export default function Pagination({
   const clamp = (v: number) => Math.min(Math.max(1, v), totalPages);
 
   // 1ページ目は ?page= を付けない
-  const makeHref = (page: number) =>
-    page <= 1 ? path : `${path}?page=${page}`;
+  const makeHref = (page: number) => {
+    const params = new URLSearchParams(query);
+    if (page > 1) params.set("page", String(page));
+    const qs = params.toString();
+    return qs ? `${path}?${qs}` : path;
+  };
 
   // ページ番号を適度に絞る（先頭/末尾＋前後2ページ）
   const pages: number[] = [];
