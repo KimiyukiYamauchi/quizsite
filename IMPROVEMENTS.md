@@ -43,9 +43,9 @@
   - [x] `StickyHeader.tsx`（状態を持たない）
   - [x] `Pagination.tsx`（パスを props で受け取り、`usePathname` / `useSearchParams` を使わないようにした）
   - 残りの `Quiz`・`QuestionCard`・`ResultPanel`・`DocumentTitle`・`error.tsx` は、状態やイベント処理を使うので必要
-- [ ] **依存パッケージを整理する**
-  - [ ] `ts-node` を削除する（どこでも使われていない）
-  - [ ] `dotenv` を `devDependencies` に移す（scripts でしか使っていない）
+- [x] **依存パッケージを整理する**
+  - [x] `ts-node` を削除する（どこでも使われていない）
+  - [x] `dotenv` を `devDependencies` に移す（scripts でしか使っていない。バージョンは 17.2.3 のまま）
 
 ## 優先度：低（細かい品質）
 
