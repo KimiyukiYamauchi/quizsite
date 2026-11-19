@@ -55,49 +55,17 @@ function normalizeQuestion(raw: Question): Question {
   };
 }
 
-// 未指定の値をクエリに含めないユーティリティ
-function buildQueries(params: {
-  limit?: number;
-  offset?: number;
-  chapter?: string;
-}) {
-  const out: MicroCMSQueries = {};
-  if (typeof params.limit === "number") out.limit = params.limit;
-  if (typeof params.offset === "number") out.offset = params.offset;
-  if (typeof params.chapter === "string" && params.chapter.length > 0) {
-    // microCMS の filters 構文で chapter による絞り込み
-    out.filters = `chapter[equals]${params.chapter}`;
-  }
-  return out;
-}
-
-async function getQuestions(params: {
-  endpoint: string;
-  limit?: number; // 100まで
-  offset?: number; // (page-1)*perPage
-  chapter?: string;
-}) {
-  const { endpoint, limit = 50, offset = 0, chapter } = params;
-
-  // chapter は URL から来る値なので、filters に組み込む前に実在する章か照合する
-  // （"[or]..." などを含む値で絞り込み条件を書き換えられるのを防ぐ）
-  if (chapter !== undefined) {
-    const chapters = await getChapters(endpoint);
-    if (!chapters.includes(chapter)) {
-      return { contents: [], totalCount: 0, offset, limit };
-    }
-  }
-
+// 問題を取得して正規化する（失敗したらログを出して投げ直す）
+async function fetchQuestions(endpoint: string, queries: MicroCMSQueries) {
   try {
     const res = await microcmsClient.get<MicroCMSListResponse<Question>>({
       endpoint,
-      queries: buildQueries({ limit, offset, chapter }),
+      queries,
       customRequestInit: cacheOptions,
     });
-
     return {
-      ...res,
-      contents: res.contents.map(normalizeQuestion),
+      items: res.contents.map(normalizeQuestion),
+      totalCount: res.totalCount,
     };
   } catch (e) {
     console.error("microCMS GET list failed:", {
@@ -110,30 +78,15 @@ async function getQuestions(params: {
   }
 }
 
-// 章の一覧を問題数つきで取得（「第2章」が「第10章」より前に来るよう数値を考慮して並べる）
-export async function getChapterSummaries(
-  endpoint: string,
-): Promise<ChapterSummary[]> {
-  const counts = new Map<string, number>();
-  for (const name of await getChapterNames(endpoint)) {
-    counts.set(name, (counts.get(name) ?? 0) + 1);
-  }
-  return Array.from(counts, ([name, count]) => ({ name, count })).sort((a, b) =>
-    a.name.localeCompare(b.name, "ja", { numeric: true }),
-  );
-}
+type ChapterIndexItem = Required<Pick<Question, "id" | "chapter">>;
 
-// エンドポイントに登録されている章の一覧（重複なし）を取得
-async function getChapters(endpoint: string): Promise<string[]> {
-  return Array.from(new Set(await getChapterNames(endpoint)));
-}
-
-// 全問題の chapter を（重複ありのまま）取得
-async function getChapterNames(endpoint: string): Promise<string[]> {
+// 全問題の id と chapter を、問題一覧と同じ並び順で取得する
+// （章の一覧・問題数の集計と、章ごとのページの絞り込みに使う）
+async function getChapterIndex(endpoint: string): Promise<ChapterIndexItem[]> {
   const fetchPage = (offset: number) =>
-    microcmsClient.get<MicroCMSListResponse<Pick<Question, "chapter">>>({
+    microcmsClient.get<MicroCMSListResponse<Pick<Question, "id" | "chapter">>>({
       endpoint,
-      queries: { fields: "chapter", limit: 100, offset },
+      queries: { fields: "id,chapter", limit: 100, offset },
       customRequestInit: cacheOptions,
     });
 
@@ -144,8 +97,21 @@ async function getChapterNames(endpoint: string): Promise<string[]> {
   const rest = await Promise.all(offsets.map(fetchPage));
 
   return [first, ...rest]
-    .flatMap((res) => res.contents.map((c) => c.chapter ?? ""))
-    .filter(Boolean);
+    .flatMap((res) => res.contents)
+    .filter((c): c is ChapterIndexItem => Boolean(c.chapter));
+}
+
+// 章の一覧を問題数つきで取得（「第2章」が「第10章」より前に来るよう数値を考慮して並べる）
+export async function getChapterSummaries(
+  endpoint: string,
+): Promise<ChapterSummary[]> {
+  const counts = new Map<string, number>();
+  for (const { chapter } of await getChapterIndex(endpoint)) {
+    counts.set(chapter, (counts.get(chapter) ?? 0) + 1);
+  }
+  return Array.from(counts, ([name, count]) => ({ name, count })).sort((a, b) =>
+    a.name.localeCompare(b.name, "ja", { numeric: true }),
+  );
 }
 
 // 1ページ分だけ取得するヘルパー（perPage は 100 以下）
@@ -160,11 +126,34 @@ export async function getQuestionsPage(params: {
   const limit = Math.min(100, Math.max(1, Math.floor(perPage) || 10));
   const offset = (current - 1) * limit;
 
-  const { contents, totalCount } = await getQuestions({
-    endpoint,
-    limit,
-    offset,
-    chapter,
+  // 章の指定なし: そのまま offset / limit で取得
+  if (chapter === undefined) {
+    const { items, totalCount } = await fetchQuestions(endpoint, {
+      limit,
+      offset,
+    });
+    return { items, totalCount, page: current, perPage: limit };
+  }
+
+  // 章の指定あり: 全問題の id と chapter から、この章の問題 id を割り出して ids で取得する。
+  // microCMS の filters（chapter[equals]...）は、章の名前にカッコが含まれると
+  // 0 件になってしまうため使わない（URL から来た値を filters に入れずに済む利点もある）
+  const ids = (await getChapterIndex(endpoint))
+    .filter((c) => c.chapter === chapter)
+    .map((c) => c.id);
+  const pageIds = ids.slice(offset, offset + limit);
+  if (pageIds.length === 0) {
+    return { items: [], totalCount: ids.length, page: current, perPage: limit };
+  }
+
+  const { items: fetched } = await fetchQuestions(endpoint, {
+    ids: pageIds.join(","),
+    limit: pageIds.length,
   });
-  return { items: contents, totalCount, page: current, perPage: limit };
+  // 返ってくる順番に頼らず、問題一覧と同じ並び順にそろえる
+  const order = new Map(pageIds.map((id, i) => [id, i]));
+  const items = fetched.sort(
+    (a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
+  );
+  return { items, totalCount: ids.length, page: current, perPage: limit };
 }
