@@ -1,0 +1,31 @@
+.box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  margin: 0 0 16px;
+  font-size: 0.95em;
+}
+
+/* シャッフル中は枠で囲んで分かるようにする */
+.on {
+  padding: 8px 12px;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  background: #eef2ff;
+}
+
+.status {
+  font-weight: 600;
+  color: #3730a3;
+}
+
+.link {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}

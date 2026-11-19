@@ -7,13 +7,19 @@ import { examPath, getExam, type ExamSlug } from "@/lib/exams";
 import { parsePage, parseSearch, PER_PAGE } from "@/lib/quizPage";
 import ChapterList from "@/components/ChapterList";
 import SearchForm from "@/components/SearchForm";
+import ShuffleControl from "@/components/ShuffleControl";
+import { parseShuffleSeed } from "@/lib/shuffle";
 import Quiz from "@/components/Quiz";
 import Pagination from "@/components/Pagination";
 import StickyHeader from "@/components/StickyHeader";
 import styles from "@/styles/Quiz.module.css";
 
 export type ExamPageProps = {
-  searchParams: Promise<{ page?: string; q?: string | string[] }>;
+  searchParams: Promise<{
+    page?: string;
+    q?: string | string[];
+    shuffle?: string | string[];
+  }>;
 };
 
 type Props = ExamPageProps & { exam: ExamSlug };
@@ -24,6 +30,7 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
   const page = parsePage(params.page);
   const { query, words } = parseSearch(params.q); // ?q= の検索語（なければ空）
   const searching = words.length > 0;
+  const shuffleSeed = parseShuffleSeed(params.shuffle); // ?shuffle= のシード（なければ元の順番）
   const basePath = examPath(exam);
 
   const [{ items, totalCount }, chapters] = await Promise.all([
@@ -32,6 +39,7 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
       page,
       perPage: PER_PAGE,
       words,
+      shuffleSeed,
     }),
     getChapterSummaries(exam.endpoint),
   ]);
@@ -56,7 +64,7 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
         {totalCount > 0 && (
           <Pagination
             path={basePath}
-            query={searching ? { q: query } : undefined}
+            query={{ q: searching ? query : undefined, shuffle: shuffleSeed }}
             total={totalCount}
             perPage={PER_PAGE}
             currentPage={page}
@@ -64,6 +72,13 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
         )}
       </StickyHeader>
       <SearchForm action={basePath} defaultValue={searching ? query : ""} />
+      {totalCount > 0 && (
+        <ShuffleControl
+          path={basePath}
+          query={{ q: searching ? query : undefined }}
+          seed={shuffleSeed}
+        />
+      )}
       {searching && totalCount > 0 && (
         <p className={styles.searchInfo}>
           「{query}」を含む問題：{totalCount} 件
@@ -77,7 +92,7 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
       />
       {items.length > 0 ? (
         <Quiz
-          key={`${query}:${page}`} // 検索語・ページごとに別コンポーネント扱いにして state を初期化する
+          key={`${query}:${shuffleSeed}:${page}`} // 検索語・並び・ページごとに別コンポーネント扱いにして state を初期化する
           questions={items}
           basePath={basePath}
         />

@@ -5,6 +5,7 @@ import "server-only";
 import { createClient, type MicroCMSQueries } from "microcms-js-sdk";
 // 型は lib/types.ts に置いている（クライアントコンポーネントからも使うため）
 import type { ChapterSummary, Question } from "@/lib/types";
+import { seededShuffle } from "@/lib/shuffle";
 
 export type MicroCMSListResponse<T> = {
   contents: T[];
@@ -167,8 +168,9 @@ export async function getQuestionsPage(params: {
   perPage: number; // 100以下
   chapter?: string; // 章で絞り込む
   words?: string[]; // 検索語（複数ならすべてを含む問題＝AND 検索）
+  shuffleSeed?: string; // 指定すると、このシードで決まる順番に問題を並べ替える
 }) {
-  const { endpoint, page, perPage, chapter, words = [] } = params;
+  const { endpoint, page, perPage, chapter, words = [], shuffleSeed } = params;
   const current = Math.max(1, Math.floor(page) || 1);
   const limit = Math.min(100, Math.max(1, Math.floor(perPage) || 10));
   const offset = (current - 1) * limit;
@@ -179,8 +181,8 @@ export async function getQuestionsPage(params: {
     perPage: limit,
   });
 
-  // 章も検索語も指定なし: microCMS に offset / limit をそのまま渡す
-  if (chapter === undefined && words.length === 0) {
+  // 章・検索語・シャッフルの指定なし: microCMS に offset / limit をそのまま渡す
+  if (chapter === undefined && words.length === 0 && !shuffleSeed) {
     const { items, totalCount } = await fetchQuestions(endpoint, {
       limit,
       offset,
@@ -189,6 +191,7 @@ export async function getQuestionsPage(params: {
   }
 
   // それ以外は、全問題の並び（問題一覧と同じ順）から条件に合う id を取り出し、ids で取得する
+  // （シャッフルするときも、この並びをシードで並べ替える）
   // - 章: microCMS の filters（chapter[equals]...）は、章の名前にカッコが含まれると
   //   0 件になってしまうため使わない
   // - 検索語: microCMS の q はスペースを含めて 1 つの語として扱うので、語ごとに検索して
@@ -198,10 +201,12 @@ export async function getQuestionsPage(params: {
     getQuestionIndex(endpoint),
     ...words.map((w) => searchIds(endpoint, w)),
   ]);
-  const ids = index
+  const matched = index
     .filter((c) => chapter === undefined || c.chapter === chapter)
     .filter((c) => wordSets.every((set) => set.has(c.id)))
     .map((c) => c.id);
+  // シャッフル: 条件に合う全問題を並べ替えてからページに分ける（ページをまたいで混ざる）
+  const ids = shuffleSeed ? seededShuffle(matched, shuffleSeed) : matched;
 
   return result(await getPageByIds(endpoint, ids, offset, limit), ids.length);
 }

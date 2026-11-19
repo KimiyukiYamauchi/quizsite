@@ -25,3 +25,16 @@ export function parseSearch(value: string | string[] | undefined) {
   );
   return { query, words };
 }
+
+// パスにクエリを付けた URL を作る（値が空のものは付けない）
+export function buildHref(
+  path: string,
+  query: Record<string, string | undefined>,
+): string {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value) params.set(key, value);
+  }
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
