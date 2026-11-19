@@ -36,7 +36,12 @@ export default async function ExamPage({ exam: slug, searchParams }: Props) {
         title={exam.title}
         breadcrumbs={[{ label: "TOP", href: "/" }, { label: exam.name }]}
       >
-        <Pagination total={totalCount} perPage={PER_PAGE} currentPage={page} />
+        <Pagination
+          path={basePath}
+          total={totalCount}
+          perPage={PER_PAGE}
+          currentPage={page}
+        />
       </StickyHeader>
       <ChapterList
         chapters={chapters}

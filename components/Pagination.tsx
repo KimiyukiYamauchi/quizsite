@@ -1,33 +1,26 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
 import styles from "./Pagination.module.css";
 
 type Props = {
+  path: string; // リンク先のパス（例: "/itf"、"/itf/chapter/..."）。?page= はこのコンポーネントが付ける
   total: number; // 全件数
   perPage?: number; // 1ページの件数（デフォ10）
   currentPage: number; // 現在ページ(1始まり)
 };
 
+// サーバーコンポーネント（パスはページから受け取るので、ブラウザ側の処理は不要）
 export default function Pagination({
+  path,
   total,
   perPage = 10,
   currentPage,
 }: Props) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const clamp = (v: number) => Math.min(Math.max(1, v), totalPages);
 
-  const makeHref = (page: number) => {
-    const params = new URLSearchParams(searchParams?.toString());
-    if (page <= 1) params.delete("page");
-    else params.set("page", String(page));
-    const qs = params.toString();
-    return qs ? `${pathname}?${qs}` : pathname;
-  };
+  // 1ページ目は ?page= を付けない
+  const makeHref = (page: number) =>
+    page <= 1 ? path : `${path}?page=${page}`;
 
   // ページ番号を適度に絞る（先頭/末尾＋前後2ページ）
   const pages: number[] = [];

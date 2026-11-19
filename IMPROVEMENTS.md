@@ -16,6 +16,11 @@
   - `not-found.tsx`（TOP・ITF+・SEA/J へのリンクつき）
   - ストリーミングで返すため、存在しない章や `?page=999` は HTTP 200 + `noindex` で 404 の画面を表示する（Next.js の仕様）
 
+- [ ] **カッコを含む章のページが表示されない（不具合）**
+  - `第10章 暗号技術(暗号)`、`第11章 電子署名(完全性を保証する技術)`、`第12章 公開鍵基盤(PKI)` の章ページが 404 になる
+  - microCMS の `filters` に `chapter[equals]第10章 暗号技術(暗号)` のようにカッコを含む値を渡すと、0 件（`totalCount` なし）が返る
+  - 章の絞り込みを `filters` 以外の方法（取得済みの章一覧から ID を絞る など）にする必要がある
+
 ## 優先度：中（設計・保守性）
 
 - [x] **ITF+ と SEA/J のページを共通化する**
@@ -34,9 +39,10 @@
 - [x] **API キーの保護を確実にする**
   - `lib/microcms.ts` に `import "server-only"` を追加（クライアントコンポーネントから import するとビルドエラー）
   - 問題データの型を `lib/types.ts` に分け、クライアントコンポーネントは `lib/microcms.ts` を参照しないようにした
-- [ ] **不要な `"use client"` を外す**
-  - [ ] `StickyHeader.tsx`（状態を持たない）
-  - [ ] `Pagination.tsx`（`basePath` を props で受け取れば `useSearchParams` は不要）
+- [x] **不要な `"use client"` を外す**
+  - [x] `StickyHeader.tsx`（状態を持たない）
+  - [x] `Pagination.tsx`（パスを props で受け取り、`usePathname` / `useSearchParams` を使わないようにした）
+  - 残りの `Quiz`・`QuestionCard`・`ResultPanel`・`DocumentTitle`・`error.tsx` は、状態やイベント処理を使うので必要
 - [ ] **依存パッケージを整理する**
   - [ ] `ts-node` を削除する（どこでも使われていない）
   - [ ] `dotenv` を `devDependencies` に移す（scripts でしか使っていない）
